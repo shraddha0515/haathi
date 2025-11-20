@@ -1,0 +1,8 @@
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+.map-container {
+  flex-grow: 1;
+}
