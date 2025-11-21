@@ -1,12 +1,56 @@
-import app from "./app.js";
+import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
-dotenv.config(); // loads .env into process.env
+dotenv.config();
+import sensorRoutes from "./routes/sensor.js";
+import elephantRoutes from "./routes/elephant.js";
+
+import db from "./config/db.js";
+
+import detectionRoutes from "./routes/detections.js";
+import deviceRoutes from "./routes/devices.js";
 
 
+const app = express();
 const PORT = process.env.PORT || 5000;
-const dbHost = process.env.DB_HOST;
 
-// Allow ESP32 on same WiFi
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Routes
+app.use("/api/sensors", sensorRoutes);
+app.use("/api/elephants", elephantRoutes);
+app.use("/api/detections", detectionRoutes);
+app.use("/api/devices", deviceRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/devices", deviceRoutes);
+
+// Health check
+app.get("/", (req, res) => {
+  res.json({ message: "Backend is running" });
+});
+
+
+// Database health check
+app.get("/health", async (req, res) => {
+  try {
+    const result = await db.query("SELECT NOW()");
+    res.json({ 
+      status: "healthy",
+      database: "connected",
+      timestamp: result.rows[0].now
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: "unhealthy",
+      database: "disconnected",
+      error: error.message
+    });
+  }
+});
+
+// Start server
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Backend running on http://localhost:${PORT}`);
+  console.log(`Backend running on http://localhost:${PORT}`);
 });

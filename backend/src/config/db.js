@@ -1,20 +1,42 @@
-// src/config/db.js
-require('dotenv').config();
-const { Pool } = require('pg');
+import pg from 'pg';
+import dotenv from 'dotenv';
+
+// Load environment variables first
+dotenv.config();
+
+const { Pool } = pg;
+
+// Validate environment variables
+if (!process.env.DATABASE_URL) {
+  console.error('🔴 DATABASE_URL is not defined in environment variables');
+  console.error('Available env vars:', Object.keys(process.env).filter(key => key.startsWith('DB')));
+  console.error('Make sure .env file exists in:', process.cwd());
+}
 
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  port: parseInt(process.env.DB_PORT, 10) || 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
+
+// Test connection
+pool.query("SELECT NOW()")
+  .then(() => console.log("🟢 Connected to Supabase PostgreSQL"))
+  .catch(err => {
+    console.error("🔴 Failed to connect to DB", err);
+    console.error("Connection string format should be: postgresql://user:password@host:port/database");
+  });
+
+pool.on("connect", () => {
+  console.log("✅ Pool connected to Supabase PostgreSQL");
 });
 
 pool.on('error', (err) => {
-  console.error('Unexpected Postgres error', err);
+  console.error('❌ Unexpected Postgres error', err);
 });
 
-module.exports = {
+const db = {
   query: (text, params) => pool.query(text, params),
   pool
 };
+
+export default db;

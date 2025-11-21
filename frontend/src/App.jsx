@@ -1,4 +1,5 @@
 import "./App.css";
+import React from "react";
 import Sidebar from "./components/Sidebar";
 import MapView from "./components/MapView";
 import AlertFeed from "./components/AlertFeed";

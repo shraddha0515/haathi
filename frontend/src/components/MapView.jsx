@@ -1,8 +1,8 @@
+import React from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "leaflet/dist/leaflet.css";
-
 
 export default function MapView() {
   const [elephants, setElephants] = useState([]);
@@ -13,7 +13,7 @@ export default function MapView() {
       .then(res => setElephants(res.data));
 
     const interval = setInterval(() => {
-      axios.get("http://localhost:5000/api/sensors/latest")
+      axios.get("http://localhost:5000/api/sensors")
         .then(res => setSensorData(res.data));
     }, 2000);
 
