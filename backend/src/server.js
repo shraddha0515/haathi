@@ -1,14 +1,15 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-dotenv.config();
 import sensorRoutes from "./routes/sensor.js";
 import elephantRoutes from "./routes/elephant.js";
-
-import db from "./config/db.js";
-
+import authRoutes from "./routes/auth.js";
 import detectionRoutes from "./routes/detections.js";
 import deviceRoutes from "./routes/devices.js";
+
+dotenv.config();
+
+import db from "./config/db.js";
 
 
 const app = express();
