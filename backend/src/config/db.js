@@ -20,18 +20,18 @@ const pool = new Pool({
 
 // Test connection
 pool.query("SELECT NOW()")
-  .then(() => console.log("🟢 Connected to Supabase PostgreSQL"))
+  .then(() => console.log("Connected to Supabase PostgreSQL"))
   .catch(err => {
-    console.error("🔴 Failed to connect to DB", err);
+    console.error("Failed to connect to DB", err);
     console.error("Connection string format should be: postgresql://user:password@host:port/database");
   });
 
 pool.on("connect", () => {
-  console.log("✅ Pool connected to Supabase PostgreSQL");
+  console.log("Pool connected to Supabase PostgreSQL");
 });
 
 pool.on('error', (err) => {
-  console.error('❌ Unexpected Postgres error', err);
+  console.error('Unexpected Postgres error', err);
 });
 
 const db = {

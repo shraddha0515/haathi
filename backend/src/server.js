@@ -29,12 +29,12 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
-app.use("/api/sensors", sensorRoutes);
+app.use("/api/sensors", sensorRoutes);            //to receive data from raspberrypi and store in db
 app.use("/api/elephants", elephantRoutes);
-app.use("/api/detections", detectionRoutes);
-app.use("/api/devices", deviceRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/devices", deviceRoutes);
+app.use("/api/detections", detectionRoutes);      //to manage elephant detections
+app.use("/api/devices", deviceRoutes);            //to manage tracking devices
+app.use("/api/auth", authRoutes);                 //to authenticare users                     //Done
+
 
 // Health check
 app.get("/", (req, res) => {
