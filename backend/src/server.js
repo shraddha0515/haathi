@@ -1,66 +1,90 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import sensorRoutes from "./routes/sensor.js";
-import elephantRoutes from "./routes/elephant.js";
 import authRoutes from "./routes/auth.js";
-import detectionRoutes from "./routes/detections.js";
+import { createServer } from "http";
+import { Server } from "socket.io";
+
+import eventRoutes from "./routes/eventRoutes.js";
 import deviceRoutes from "./routes/devices.js";
+
 
 dotenv.config();
 
 import db from "./config/db.js";
 
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const corsOptions = {
-  origin: [
-    'http://localhost:5173',
-    'https://your-frontend-domain.vercel.app', // Add your frontend URL later
-    'https://your-frontend-domain.netlify.app'
-  ],
-  credentials: true
-};
+const allowedOrigins = [
+  "http://localhost:5173",                // local frontend
+  "http://localhost:3000",                // optional
+  "exp://*",                              // Expo mobile app
+  "https://your-frontend-url.vercel.app", // deployed frontend
+ 
+];
 
-// Middleware
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || origin.startsWith("exp://")) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 
-// Routes
-app.use("/api/sensors", sensorRoutes);            //to receive data from raspberrypi and store in db
-app.use("/api/elephants", elephantRoutes);
-app.use("/api/detections", detectionRoutes);      //to manage elephant detections
-app.use("/api/devices", deviceRoutes);            //to manage tracking devices
-app.use("/api/auth", authRoutes);                 //to authenticare users                     //Done
+// Create HTTP server
+const server = createServer(app);
+// Setup Socket.IO
+export const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true
+  },
+});
 
+// Listen for WebSocket connections
+io.on("connection", (socket) => {
+  console.log("New WebSocket client connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id);
+  });
+});
+// Routes
+
+// ---------------------- ROUTES ----------------------
+app.use("/api/auth", authRoutes);
+app.use("/api/devices", deviceRoutes);
+app.use("/api/events", eventRoutes);
 
 // Health check
 app.get("/", (req, res) => {
   res.json({ message: "Backend is running" });
 });
 
-
 // Database health check
 app.get("/health", async (req, res) => {
   try {
     const result = await db.query("SELECT NOW()");
-    res.json({ 
+    res.json({
       status: "healthy",
       database: "connected",
-      timestamp: result.rows[0].now
+      timestamp: result.rows[0].now,
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       status: "unhealthy",
       database: "disconnected",
-      error: error.message
+      error: error.message,
     });
   }
 });
 
 // Start server
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server + WebSockets running on http://localhost:${PORT}`);
 });
