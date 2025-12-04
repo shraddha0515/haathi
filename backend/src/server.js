@@ -24,16 +24,34 @@ const allowedOrigins = [
  
 ];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin) || origin.startsWith("exp://")) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // allow mobile apps + dev tools
+
+      const allowed = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000",
+        /\.ngrok-free\.app$/,
+        /^exp:\/\/.*/
+      ];
+
+      const isAllowed = allowed.some((o) => {
+        if (o instanceof RegExp) return o.test(origin);
+        return o === origin;
+      });
+
+      if (isAllowed) callback(null, true);
+      else callback(new Error("CORS: Origin Not Allowed -> " + origin));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json());
 
 // Create HTTP server

@@ -1,5 +1,5 @@
 import express from "express";
-import { register, login, getProfile, logout } from "../controllers/authController.js";
+import { register, login, getProfile, logout, refresh } from "../controllers/authController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
 
@@ -9,5 +9,8 @@ router.post("/register", register);
 router.post("/login", login);
 router.get("/me", authMiddleware, getProfile);
 router.post("/logout", authMiddleware, logout);
+
+// Get new access token using refresh token cookie
+router.post("/refresh", refresh);
 
 export default router;

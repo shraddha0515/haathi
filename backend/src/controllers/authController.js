@@ -90,10 +90,11 @@ export const login = async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "strict",
+      secure: false,       // ✔ must be FALSE in local dev
+      sameSite: "lax",     // ✔ allow cross-site cookies on http
       path: "/"
     });
+    
 
     return res.json({
       message: "Login successful",
