@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "leaflet/dist/leaflet.css";
+
+/* Optional base styling */
+body {
+  @apply bg-gray-50;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.Toastify__toast {
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.Toastify__toast--error {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.Toastify__toast--success {
+  background-color: #dcfce7;
+  color: #166534;
+}
