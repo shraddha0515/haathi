@@ -2,9 +2,6 @@ import admin from '../config/firebase.js';
 import db from '../config/db.js';
 import { io } from '../server.js';
 
-/**
- * Save FCM token for a user
- */
 export const registerFCMToken = async (req, res) => {
   try {
     const { fcm_token, device_type } = req.body;
@@ -25,12 +22,8 @@ export const registerFCMToken = async (req, res) => {
   }
 };
 
-/**
- * Send push notification to specific users
- */
 export const sendPushNotification = async (userIds, title, body, data = {}) => {
   try {
-    // Get FCM tokens for users
     const result = await db.query(
       `SELECT DISTINCT fcm_token FROM user_fcm_tokens WHERE user_id = ANY($1)`,
       [userIds]
@@ -43,7 +36,6 @@ export const sendPushNotification = async (userIds, title, body, data = {}) => {
       return;
     }
 
-    // Send multicast message
     const message = {
       notification: {
         title,
@@ -60,7 +52,6 @@ export const sendPushNotification = async (userIds, title, body, data = {}) => {
     
     console.log(`Sent ${response.successCount} notifications`);
     
-    // Remove invalid tokens
     if (response.failureCount > 0) {
       const invalidTokens = [];
       response.responses.forEach((resp, idx) => {
@@ -83,28 +74,21 @@ export const sendPushNotification = async (userIds, title, body, data = {}) => {
   }
 };
 
-/**
- * Send notification to all registered users
- */
 export const sendNotificationToAll = async (req, res) => {
   try {
     const { title, body, data } = req.body;
 
-    // Get all user IDs
     const result = await db.query(`SELECT id FROM users`);
     const userIds = result.rows.map(row => row.id);
 
-    // Save notification to database
     await db.query(
       `INSERT INTO notifications (user_id, title, body, data)
        SELECT id, $1, $2, $3 FROM users`,
       [title, body, JSON.stringify(data || {})]
     );
 
-    // Send push notifications
     await sendPushNotification(userIds, title, body, data);
 
-    // Broadcast via WebSocket
     io.emit('notification', {
       title,
       body,
@@ -119,9 +103,6 @@ export const sendNotificationToAll = async (req, res) => {
   }
 };
 
-/**
- * Get user notifications
- */
 export const getUserNotifications = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -142,9 +123,6 @@ export const getUserNotifications = async (req, res) => {
   }
 };
 
-/**
- * Mark notification as read
- */
 export const markAsRead = async (req, res) => {
   try {
     const { id } = req.params;

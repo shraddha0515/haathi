@@ -22,8 +22,8 @@ function App() {
     <Router>
       <Routes>
         {/* Auth Routes */}
-        <Route path="/" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
         {/* Setup Wizard Routes */}
         <Route path="/setup/welcome" element={<SetupWelcome />} />

@@ -10,7 +10,6 @@ router.post("/login", login);
 router.get("/me", authMiddleware, getProfile);
 router.post("/logout", authMiddleware, logout);
 
-// Get new access token using refresh token cookie
 router.post("/refresh", refresh);
 
 export default router;

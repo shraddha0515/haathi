@@ -8,9 +8,9 @@ import {
 
 const router = express.Router();
 
-router.post("/receive", receiveEvent);                  // Raspberry Pi
-router.get("/latest/:device_id", getLatestEvent);       // Frontend map
-router.get("/history/:device_id", getEventHistory);     // Movement log
-router.get("/", getAllEvents);                          // Admin/Officer list
+router.post("/receive", receiveEvent);
+router.get("/latest/:device_id", getLatestEvent);
+router.get("/history/:device_id", getEventHistory);
+router.get("/", getAllEvents);
 
 export default router;

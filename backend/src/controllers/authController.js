@@ -9,7 +9,6 @@ export const register = async (req, res) => {
     if (!name || !email || !password)
       return res.status(400).json({ error: "All fields required" });
 
-    // check duplicate email
     const existing = await db.query("SELECT id FROM users WHERE email=$1", [email]);
     if (existing.rows.length > 0)
       return res.status(400).json({ error: "Email already exists" });
@@ -25,7 +24,6 @@ export const register = async (req, res) => {
 
     const user = result.rows[0];
 
-    // tokens
     const accessToken = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET,
@@ -38,7 +36,6 @@ export const register = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // set cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
@@ -90,8 +87,8 @@ export const login = async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,       // ✔ must be FALSE in local dev
-      sameSite: "lax",     // ✔ allow cross-site cookies on http
+      secure: false,
+      sameSite: "lax",
       path: "/"
     });
     

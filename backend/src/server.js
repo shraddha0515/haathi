@@ -4,9 +4,10 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import notificationRoutes from './routes/notifications.js';
+import notificationRoutes from "./routes/notifications.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import deviceRoutes from "./routes/devices.js";
+import hotspotRoutes from './routes/hotspots.js';
 
 
 dotenv.config();
@@ -17,17 +18,16 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
-  "http://localhost:5173",                // local frontend
-  "http://localhost:3000",                // optional
-  "exp://*",                              // Expo mobile app
-  "https://your-frontend-url.vercel.app", // deployed frontend
- 
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "exp://*",
+  "https://your-frontend-url.vercel.app",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allow mobile apps + dev tools
+      if (!origin) return callback(null, true);
 
       const allowed = [
         "http://localhost:5173",
@@ -35,7 +35,7 @@ app.use(
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
         /\.ngrok-free\.app$/,
-        /^exp:\/\/.*/
+        /^exp:\/\/.*/,
       ];
 
       const isAllowed = allowed.some((o) => {
@@ -54,17 +54,14 @@ app.use(
 
 app.use(express.json());
 
-// Create HTTP server
 const server = createServer(app);
-// Setup Socket.IO
 export const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
-    credentials: true
+    credentials: true,
   },
 });
 
-// Listen for WebSocket connections
 io.on("connection", (socket) => {
   console.log("New WebSocket client connected:", socket.id);
 
@@ -72,20 +69,17 @@ io.on("connection", (socket) => {
     console.log("Client disconnected:", socket.id);
   });
 });
-// Routes
 
-// ---------------------- ROUTES ----------------------
 app.use("/api/auth", authRoutes);
 app.use("/api/devices", deviceRoutes);
 app.use("/api/events", eventRoutes);
-app.use('/api/notifications', notificationRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use('/api/hotspots', hotspotRoutes);
 
-// Health check
 app.get("/", (req, res) => {
   res.json({ message: "Backend is running" });
 });
 
-// Database health check
 app.get("/health", async (req, res) => {
   try {
     const result = await db.query("SELECT NOW()");
@@ -103,7 +97,6 @@ app.get("/health", async (req, res) => {
   }
 });
 
-// Start server
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server + WebSockets running on http://localhost:${PORT}`);
 });

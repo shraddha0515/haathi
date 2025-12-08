@@ -1,10 +1,8 @@
 import db from "../config/db.js";
-import { io } from "../server.js";   // SOCKET.IO
+import { io } from "../server.js";
 import { sendPushNotification } from './notificationController.js';
+import { checkProximityAlerts } from './hotspotController.js';
 
-/**
- * @desc Receive detection from Raspberry Pi
- */
 export const receiveEvent = async (req, res) => {
   try {
     const {
@@ -38,7 +36,6 @@ export const receiveEvent = async (req, res) => {
     const result = await db.query(insertQuery, values);
     const data = result.rows[0];
 
-    // Update device health
     await db.query(
       `
       UPDATE devices
@@ -51,10 +48,8 @@ export const receiveEvent = async (req, res) => {
       [battery_percentage || null, device_id]
     );
 
-    // REAL-TIME BROADCAST
     io.emit("new_event", data);
 
-     // 📱 SEND PUSH NOTIFICATION TO ALL USERS
      const userResult = await db.query(`SELECT id FROM users`);
      const userIds = userResult.rows.map(row => row.id);
  
@@ -71,7 +66,6 @@ export const receiveEvent = async (req, res) => {
        }
      );
  
-     // Save notification to database
     await db.query(
       `INSERT INTO notifications (user_id, title, body, data)
        SELECT id, $1, $2, $3 FROM users`,
@@ -87,6 +81,8 @@ export const receiveEvent = async (req, res) => {
       ]
     );
 
+    await checkProximityAlerts(latitude, longitude, device_id);
+
     return res.status(201).json({
       message: "Event stored & broadcasted",
       data
@@ -100,9 +96,6 @@ export const receiveEvent = async (req, res) => {
 
 
 
-/**
- * @desc Get latest event for a device
- */
 export const getLatestEvent = async (req, res) => {
   try {
     const { device_id } = req.params;
@@ -130,9 +123,6 @@ export const getLatestEvent = async (req, res) => {
 
 
 
-/**
- * @desc Get event history for a device
- */
 export const getEventHistory = async (req, res) => {
   try {
     const { device_id } = req.params;
@@ -156,9 +146,6 @@ export const getEventHistory = async (req, res) => {
 
 
 
-/**
- * @desc Get all detection events (Admin + Officer)
- */
 export const getAllEvents = async (req, res) => {
   try {
     const query = `

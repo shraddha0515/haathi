@@ -16,11 +16,11 @@ export default function Header() {
     <header className="flex items-center justify-between bg-white shadow-sm border-b border-green-200 px-6 py-3 sticky top-0 z-50">
       {/* Left side */}
       <div className="flex items-center gap-3">
-        <img
+        {/* <img
           src="https://cdn-icons-png.flaticon.com/512/616/616408.png"
           alt="Airavata Logo"
           className="w-8 h-8"
-        />
+        /> */}
         <div>
           <h1 className="text-green-700 font-semibold text-lg">Project Airavata</h1>
           <p className="text-xs text-gray-500 -mt-1">HEC Command Center</p>

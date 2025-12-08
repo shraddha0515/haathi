@@ -1,8 +1,5 @@
 import db from "../config/db.js";
 
-/**
- * @desc Register a new device (Admin only)
- */
 export const createDevice = async (req, res) => {
   try {
     const { device_id, description, latitude, longitude } = req.body;
@@ -11,7 +8,6 @@ export const createDevice = async (req, res) => {
       return res.status(400).json({ error: "device_id, latitude, longitude are required" });
     }
 
-    // Insert device with PostGIS geography point
     const result = await db.query(
       `
       INSERT INTO devices (device_id, description, install_geom)
@@ -36,9 +32,6 @@ export const createDevice = async (req, res) => {
 };
 
 
-/**
- * @desc Get all devices (Admin + Officer)
- */
 export const getDevices = async (req, res) => {
   try {
     const result = await db.query(
@@ -66,9 +59,6 @@ export const getDevices = async (req, res) => {
 
 
 
-/**
- * @desc Get single device
- */
 export const getDeviceById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -105,9 +95,6 @@ export const getDeviceById = async (req, res) => {
 
 
 
-/**
- * @desc Update device location or description
- */
 export const updateDevice = async (req, res) => {
   try {
     const { id } = req.params;
@@ -165,19 +152,14 @@ export const updateDevice = async (req, res) => {
 
 
 
-/**
- * @desc Delete device
- */
 export const deleteDevice = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Verify ID type
     if (!id) {
       return res.status(400).json({ error: "Device ID is required" });
     }
 
-    // Check if device exists
     const check = await db.query(
       `SELECT id FROM devices WHERE id = $1`,
       [id]
@@ -187,7 +169,6 @@ export const deleteDevice = async (req, res) => {
       return res.status(404).json({ error: "Device not found" });
     }
 
-    // Delete device
     await db.query(`DELETE FROM devices WHERE id = $1`, [id]);
 
     res.status(200).json({ message: "Device deleted successfully" });

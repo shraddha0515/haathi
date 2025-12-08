@@ -13,19 +13,51 @@ export default function UserDashboard() {
     const [elephantLocation, setElephantLocation] = useState(null);
     const [notifications, setNotifications] = useState([]);
     const [isSafe, setIsSafe] = useState(true);
+    const [locationError, setLocationError] = useState(null);
+    const [locationLoading, setLocationLoading] = useState(true);
 
-    // 1. Get User Location
+    // 1. Get User Location with better error handling
     useEffect(() => {
-        if (navigator.geolocation) {
-            const watchId = navigator.geolocation.watchPosition(
-                (position) => {
-                    setUserLocation([position.coords.latitude, position.coords.longitude]);
-                },
-                (error) => console.error("Error getting location:", error),
-                { enableHighAccuracy: true }
-            );
-            return () => navigator.geolocation.clearWatch(watchId);
+        if (!navigator.geolocation) {
+            setLocationError("Geolocation is not supported by your browser");
+            setLocationLoading(false);
+            return;
         }
+
+        const watchId = navigator.geolocation.watchPosition(
+            (position) => {
+                setUserLocation([position.coords.latitude, position.coords.longitude]);
+                setLocationError(null);
+                setLocationLoading(false);
+                console.log("✅ Location acquired:", position.coords.latitude, position.coords.longitude);
+            },
+            (error) => {
+                setLocationLoading(false);
+                let errorMessage = "";
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = "Location permission denied. Please enable location access in your browser settings.";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = "Location information is unavailable.";
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = "Location request timed out.";
+                        break;
+                    default:
+                        errorMessage = "An unknown error occurred while getting location.";
+                }
+                setLocationError(errorMessage);
+                console.error("❌ Geolocation error:", errorMessage, error);
+            },
+            { 
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+        
+        return () => navigator.geolocation.clearWatch(watchId);
     }, []);
 
     // 2. Handle Real-time Events (Socket)
@@ -118,12 +150,48 @@ export default function UserDashboard() {
                 </div>
             )}
 
+            {/* Location Status Banner */}
+            {locationLoading && (
+                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl">
+                    <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
+                        <div>
+                            <h3 className="text-blue-800 font-bold">Getting your location...</h3>
+                            <p className="text-blue-600 text-sm">Please allow location access when prompted</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {locationError && (
+                <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-xl">
+                    <div className="flex items-center">
+                        <AlertTriangle className="w-6 h-6 text-yellow-600 mr-3" />
+                        <div>
+                            <h3 className="text-yellow-800 font-bold">Location Access Issue</h3>
+                            <p className="text-yellow-700 text-sm">{locationError}</p>
+                            <p className="text-yellow-600 text-xs mt-1">
+                                💡 Tip: Check your browser's address bar for location permission prompt
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Map Section */}
                 <div className="lg:col-span-2 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                    <div className="flex items-center mb-4">
-                        <MapIcon className="w-5 h-5 text-emerald-500 mr-2" />
-                        <h2 className="text-lg font-semibold text-gray-700">{t("live_map")}</h2>
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center">
+                            <MapIcon className="w-5 h-5 text-emerald-500 mr-2" />
+                            <h2 className="text-lg font-semibold text-gray-700">{t("live_map")}</h2>
+                        </div>
+                        {userLocation && (
+                            <span className="flex items-center text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                                <span className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></span>
+                                Location Active
+                            </span>
+                        )}
                     </div>
                     <MapView userLocation={userLocation} elephantLocation={elephantLocation} />
                 </div>

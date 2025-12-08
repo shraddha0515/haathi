@@ -1,12 +1,11 @@
 import pg from 'pg';
 import dotenv from 'dotenv';
 
-// Load environment variables first
+
 dotenv.config();
 
 const { Pool } = pg;
 
-// Validate environment variables
 if (!process.env.DATABASE_URL) {
   console.error(' DATABASE_URL is not defined in environment variables');
   console.error('Available env vars:', Object.keys(process.env).filter(key => key.startsWith('DB')));
@@ -18,7 +17,6 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
-// Test connection
 pool.query("SELECT NOW()")
   .then(() => console.log("Connected to Supabase PostgreSQL"))
   .catch(err => {

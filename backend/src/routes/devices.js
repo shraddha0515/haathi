@@ -11,12 +11,7 @@ import {
 
 const router = express.Router();
 
-/**
- * @route   POST /api/devices/create
- * @desc    Register a new device
- * @access  Admin only
- * @body    { device_id, description?, latitude, longitude }
- */
+
 router.post(
   "/create",
   authMiddleware,
@@ -24,11 +19,6 @@ router.post(
   createDevice
 );
 
-/**
- * @route   GET /api/devices
- * @desc    Get all devices
- * @access  Admin + Officer
- */
 router.get(
   "/",
   authMiddleware,
@@ -36,12 +26,7 @@ router.get(
   getDevices
 );
 
-/**
- * @route   GET /api/devices/:id
- * @desc    Get single device by ID
- * @access  Admin + Officer
- * @params  id - Device ID
- */
+
 router.get(
   "/:id",
   authMiddleware,
@@ -49,13 +34,6 @@ router.get(
   getDeviceById
 );
 
-/**
- * @route   PUT /api/devices/:id
- * @desc    Update device location or description
- * @access  Admin only
- * @params  id - Device ID
- * @body    { description?, latitude?, longitude? }
- */
 router.put(
   "/:id",
   authMiddleware,
@@ -63,12 +41,7 @@ router.put(
   updateDevice
 );
 
-/**
- * @route   DELETE /api/devices/:id
- * @desc    Delete device
- * @access  Admin only
- * @params  id - Device ID
- */
+
 router.delete(
   "/:id",
   authMiddleware,
