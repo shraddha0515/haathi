@@ -2,17 +2,15 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
+import "./i18n"; // Import i18n configuration
+import { SocketProvider } from "./context/SocketContext";
 
-function ErrorBoundary({ children }) {
-  try {
-    return children;
-  } catch (e) {
-    return <h1 style={{ color: "red" }}>App crashed: {e.message}</h1>;
-  }
-}
-
-ReactDOM.createRoot(document.getElementById("root")).render(
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
   <React.StrictMode>
-    <App />
+    <SocketProvider>
+      <App />
+    </SocketProvider>
   </React.StrictMode>
 );
+

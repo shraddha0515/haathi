@@ -1,50 +1,86 @@
-import React from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-export default function MapView() {
-  const [elephants, setElephants] = useState([]);
-  const [sensorData, setSensorData] = useState(null);
+// Fix for default marker icon issues in React Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
+// Custom Icons
+const elephantIcon = new L.Icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/375/375048.png", // Elephant icon
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
+});
+
+const userIcon = new L.Icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/9131/9131546.png", // Person icon
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
+});
+
+// Component to center map on updates
+function MapUpdater({ center }) {
+  const map = useMap();
   useEffect(() => {
-    axios.get("http://localhost:5000/api/elephants")
-      .then(res => setElephants(res.data));
+    if (center) {
+      map.flyTo(center, map.getZoom());
+    }
+  }, [center, map]);
+  return null;
+}
 
-    const interval = setInterval(() => {
-      axios.get("http://localhost:5000/api/sensors")
-        .then(res => setSensorData(res.data));
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, []);
+export default function MapView({ userLocation, elephantLocation }) {
+  const defaultCenter = [21.34, 82.75]; // Default fallback
 
   return (
-    <MapContainer
-      center={[21.3, 82.7]}
-      zoom={8}
-      style={{ height: "100%", width: "100%" }}
-    >
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+    <div className="w-full h-[500px] rounded-xl border border-emerald-200 shadow-inner overflow-hidden relative z-0">
+      <MapContainer
+        center={userLocation || defaultCenter}
+        zoom={13}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="&copy; OpenStreetMap contributors"
+        />
 
-      {elephants.map((e) => (
-        <Marker key={e.id} position={[e.location[0], e.location[1]]}>
-          <Popup>
-            <b>{e.name}</b> <br />
-            Status: {e.status}
-          </Popup>
-        </Marker>
-      ))}
+        {/* User Marker */}
+        {userLocation && (
+          <Marker position={userLocation} icon={userIcon}>
+            <Popup>
+              <div className="text-center">
+                <b className="text-blue-600">You are here</b>
+                <p className="text-xs text-gray-500 m-0">Live Location</p>
+              </div>
+            </Popup>
+          </Marker>
+        )}
 
-      {sensorData && (
-        <Marker position={[21.5, 82.9]}>
-          <Popup>
-            <b>Live Sensor Data</b><br />
-            {JSON.stringify(sensorData)}
-          </Popup>
-        </Marker>
-      )}
-    </MapContainer>
+        {/* Elephant Marker */}
+        {elephantLocation && (
+          <Marker position={elephantLocation} icon={elephantIcon}>
+            <Popup>
+              <div className="text-center">
+                <b className="text-red-600">Elephant Detected!</b>
+                <p className="text-xs text-gray-500 m-0">Stay Away</p>
+              </div>
+            </Popup>
+          </Marker>
+        )}
+
+        <MapUpdater center={userLocation || elephantLocation || defaultCenter} />
+      </MapContainer>
+    </div>
   );
 }
