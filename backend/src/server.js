@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
-
+import notificationRoutes from './routes/notifications.js';
 import eventRoutes from "./routes/eventRoutes.js";
 import deviceRoutes from "./routes/devices.js";
 
@@ -78,6 +78,7 @@ io.on("connection", (socket) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/devices", deviceRoutes);
 app.use("/api/events", eventRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Health check
 app.get("/", (req, res) => {

@@ -8,7 +8,7 @@ const { Pool } = pg;
 
 // Validate environment variables
 if (!process.env.DATABASE_URL) {
-  console.error('🔴 DATABASE_URL is not defined in environment variables');
+  console.error(' DATABASE_URL is not defined in environment variables');
   console.error('Available env vars:', Object.keys(process.env).filter(key => key.startsWith('DB')));
   console.error('Make sure .env file exists in:', process.cwd());
 }

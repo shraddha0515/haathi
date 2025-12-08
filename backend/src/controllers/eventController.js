@@ -1,5 +1,6 @@
 import db from "../config/db.js";
 import { io } from "../server.js";   // SOCKET.IO
+import { sendPushNotification } from './notificationController.js';
 
 /**
  * @desc Receive detection from Raspberry Pi
@@ -19,23 +20,14 @@ export const receiveEvent = async (req, res) => {
         error: "device_id, latitude, longitude are required"
       });
     }
-
-    // Insert into detections table
     const insertQuery = `
-      INSERT INTO detections 
-      (source_device, latitude, longitude, location, confidence, battery_percentage)
-      VALUES (
-        $1,
-        $2,
-        $3,
-        ST_SetSRID(ST_Point($3, $2), 4326),
-        $4,
-        $5
-      )
-      RETURNING *;
-    `;
+    INSERT INTO detections 
+    (source_device, latitude, longitude, location, confidence, battery_percentage)
+    VALUES ($1, $2, $3, ST_SetSRID(ST_Point($3, $2), 4326), $4, $5)
+    RETURNING *;
+  `;
 
-    const values = [
+      const values = [
       device_id,
       latitude,
       longitude,
@@ -59,8 +51,41 @@ export const receiveEvent = async (req, res) => {
       [battery_percentage || null, device_id]
     );
 
-    // 🔥 REAL-TIME BROADCAST
+    // REAL-TIME BROADCAST
     io.emit("new_event", data);
+
+     // 📱 SEND PUSH NOTIFICATION TO ALL USERS
+     const userResult = await db.query(`SELECT id FROM users`);
+     const userIds = userResult.rows.map(row => row.id);
+ 
+     await sendPushNotification(
+       userIds,
+       'Elephant Detected!',
+       `Device ${device_id} detected movement at coordinates (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`,
+       {
+         event_id: data.id.toString(),
+         device_id,
+         latitude: latitude.toString(),
+         longitude: longitude.toString(),
+         type: 'elephant_detection'
+       }
+     );
+ 
+     // Save notification to database
+    await db.query(
+      `INSERT INTO notifications (user_id, title, body, data)
+       SELECT id, $1, $2, $3 FROM users`,
+      [
+        'Elephant Detected!',
+        `Device ${device_id} detected movement`,
+        JSON.stringify({
+          event_id: data.id,
+          device_id,
+          latitude,
+          longitude
+        })
+      ]
+    );
 
     return res.status(201).json({
       message: "Event stored & broadcasted",
