@@ -22,7 +22,6 @@ const allowedOrigins = [
   "http://localhost:3000",
   "exp://*",
   "https://haathi.vercel.app",
-  "https://haathi.vercel.app"
 ];
 
 app.use(
