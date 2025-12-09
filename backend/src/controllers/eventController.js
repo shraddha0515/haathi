@@ -1,5 +1,5 @@
 import db from "../config/db.js";
-import { io } from "../server.js";
+import { io } from "../../server.js";
 import { sendPushNotification } from './notificationController.js';
 import { checkProximityAlerts } from './hotspotController.js';
 

@@ -1,6 +1,6 @@
 import admin from '../config/firebase.js';
 import db from '../config/db.js';
-import { io } from '../server.js';
+import { io } from '../../server.js';
 
 export const registerFCMToken = async (req, res) => {
   try {

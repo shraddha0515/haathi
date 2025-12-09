@@ -1,17 +1,17 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import authRoutes from "./routes/auth.js";
+import authRoutes from "./src/routes/auth.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import notificationRoutes from "./routes/notifications.js";
-import eventRoutes from "./routes/eventRoutes.js";
-import deviceRoutes from "./routes/devices.js";
-import hotspotRoutes from "./routes/hotspots.js";
+import notificationRoutes from "./src/routes/notifications.js";
+import eventRoutes from "./src/routes/eventRoutes.js";
+import deviceRoutes from "./src/routes/devices.js";
+import hotspotRoutes from "./src/routes/hotspots.js";
 
 dotenv.config();
 
-import db from "./config/db.js";
+import db from "./src/config/db.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
