@@ -7,8 +7,7 @@ import { Server } from "socket.io";
 import notificationRoutes from "./routes/notifications.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import deviceRoutes from "./routes/devices.js";
-import hotspotRoutes from './routes/hotspots.js';
-
+import hotspotRoutes from "./routes/hotspots.js";
 
 dotenv.config();
 
@@ -20,8 +19,11 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
-  "exp://*",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:3000",
   "https://haathi.vercel.app",
+  /\.ngrok-free\.app$/,
+  /^exp:\/\/.*/,
 ];
 
 app.use(
@@ -29,16 +31,7 @@ app.use(
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
 
-      const allowed = [
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000",
-        /\.ngrok-free\.app$/,
-        /^exp:\/\/.*/,
-      ];
-
-      const isAllowed = allowed.some((o) => {
+      const isAllowed = allowedOrigins.some((o) => {
         if (o instanceof RegExp) return o.test(origin);
         return o === origin;
       });
@@ -55,6 +48,7 @@ app.use(
 app.use(express.json());
 
 const server = createServer(app);
+
 export const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -74,7 +68,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/devices", deviceRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/notifications", notificationRoutes);
-app.use('/api/hotspots', hotspotRoutes);
+app.use("/api/hotspots", hotspotRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Backend is running" });
