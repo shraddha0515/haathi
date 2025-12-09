@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Users, Shield, Activity, Plus, Search, HardDrive } from "lucide-react";
+import Sidebar from "../components/Sidebar";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -37,7 +38,10 @@ export default function AdminDashboard() {
     };
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="flex h-screen bg-gray-50">
+            <Sidebar />
+            <div className="flex-1 overflow-y-auto">
+                <div className="p-6 space-y-6">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
@@ -210,6 +214,8 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             )}
+                </div>
+            </div>
         </div>
     );
 }

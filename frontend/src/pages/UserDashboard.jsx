@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useSocket } from "../context/SocketContext";
+import Sidebar from "../components/Sidebar";
 import MapView from "../components/MapView";
 import { Bell, Map as MapIcon, AlertTriangle, ShieldCheck, Globe } from "lucide-react";
 import axios from "axios";
@@ -50,13 +51,13 @@ export default function UserDashboard() {
                 setLocationError(errorMessage);
                 console.error("❌ Geolocation error:", errorMessage, error);
             },
-            { 
+            {
                 enableHighAccuracy: true,
                 timeout: 10000,
                 maximumAge: 0
             }
         );
-        
+
         return () => navigator.geolocation.clearWatch(watchId);
     }, []);
 
@@ -106,129 +107,135 @@ export default function UserDashboard() {
     };
 
     return (
-        <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{t("dashboard_title")}</h1>
-                    <p className="text-gray-500 text-sm mt-1">{t("welcome")}, User</p>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                    <button
-                        onClick={toggleLanguage}
-                        className="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
-                    >
-                        <Globe className="w-4 h-4 mr-2 text-blue-500" />
-                        {t("switch_language")}
-                    </button>
-                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium text-sm whitespace-nowrap">
-                        {t("status_active")}
-                    </span>
-                </div>
-            </div>
-
-            {/* Safety Alert Banner */}
-            {!isSafe ? (
-                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl animate-pulse">
-                    <div className="flex items-center">
-                        <AlertTriangle className="w-6 h-6 text-red-600 mr-3" />
+        <div className="flex h-screen bg-gray-50">
+            <Sidebar />
+            <div className="flex-1 overflow-y-auto">
+                <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
+                    {/* Header */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
-                            <h3 className="text-red-800 font-bold text-lg">{t("danger_alert")}</h3>
-                            <p className="text-red-600 text-sm">Please move to a safe location immediately.</p>
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{t("dashboard_title")}</h1>
+                            <p className="text-gray-500 text-sm mt-1">{t("welcome")}, User</p>
                         </div>
-                    </div>
-                </div>
-            ) : (
-                <div className="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-xl">
-                    <div className="flex items-center">
-                        <ShieldCheck className="w-6 h-6 text-emerald-600 mr-3" />
-                        <div>
-                            <h3 className="text-emerald-800 font-bold">{t("safe_status")}</h3>
-                        </div>
-                    </div>
-                </div>
-            )}
 
-            {/* Location Status Banner */}
-            {locationLoading && (
-                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl">
-                    <div className="flex items-center">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
-                        <div>
-                            <h3 className="text-blue-800 font-bold">Getting your location...</h3>
-                            <p className="text-blue-600 text-sm">Please allow location access when prompted</p>
-                        </div>
-                    </div>
-                </div>
-            )}
-            
-            {locationError && (
-                <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-xl">
-                    <div className="flex items-center">
-                        <AlertTriangle className="w-6 h-6 text-yellow-600 mr-3" />
-                        <div>
-                            <h3 className="text-yellow-800 font-bold">Location Access Issue</h3>
-                            <p className="text-yellow-700 text-sm">{locationError}</p>
-                            <p className="text-yellow-600 text-xs mt-1">
-                                💡 Tip: Check your browser's address bar for location permission prompt
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Map Section */}
-                <div className="lg:col-span-2 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center">
-                            <MapIcon className="w-5 h-5 text-emerald-500 mr-2" />
-                            <h2 className="text-lg font-semibold text-gray-700">{t("live_map")}</h2>
-                        </div>
-                        {userLocation && (
-                            <span className="flex items-center text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                                <span className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></span>
-                                Location Active
+                        <div className="flex items-center space-x-3">
+                            <button
+                                onClick={toggleLanguage}
+                                className="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
+                            >
+                                <Globe className="w-4 h-4 mr-2 text-blue-500" />
+                                {t("switch_language")}
+                            </button>
+                            <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium text-sm whitespace-nowrap">
+                                {t("status_active")}
                             </span>
-                        )}
-                    </div>
-                    <MapView userLocation={userLocation} elephantLocation={elephantLocation} />
-                </div>
-
-                {/* Notifications Section */}
-                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 h-fit max-h-[600px] overflow-y-auto">
-                    <div className="flex items-center justify-between mb-4 sticky top-0 bg-white pb-2 border-b border-gray-100">
-                        <div className="flex items-center">
-                            <Bell className="w-5 h-5 text-emerald-500 mr-2" />
-                            <h2 className="text-lg font-semibold text-gray-700">{t("notifications")}</h2>
                         </div>
-                        <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                            {notifications.length}
-                        </span>
                     </div>
 
-                    <div className="space-y-3">
-                        {notifications.length > 0 ? (
-                            notifications.map((notif) => (
-                                <div
-                                    key={notif.id}
-                                    className={`p-3 rounded-xl border-l-4 ${notif.type === 'warning' ? 'border-amber-500 bg-amber-50' : 'border-blue-500 bg-blue-50'
-                                        }`}
-                                >
-                                    <p className="text-sm font-medium text-gray-800">{notif.message}</p>
-                                    <p className="text-xs text-gray-500 mt-1">{notif.time}</p>
+                    {/* Safety Alert Banner */}
+                    {!isSafe ? (
+                        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl animate-pulse">
+                            <div className="flex items-center">
+                                <AlertTriangle className="w-6 h-6 text-red-600 mr-3" />
+                                <div>
+                                    <h3 className="text-red-800 font-bold text-lg">{t("danger_alert")}</h3>
+                                    <p className="text-red-600 text-sm">Please move to a safe location immediately.</p>
                                 </div>
-                            ))
-                        ) : (
-                            <div className="text-center py-8">
-                                <Bell className="w-12 h-12 text-gray-200 mx-auto mb-2" />
-                                <p className="text-gray-400 text-sm">{t("no_notifications")}</p>
                             </div>
-                        )}
+                        </div>
+                    ) : (
+                        <div className="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-xl">
+                            <div className="flex items-center">
+                                <ShieldCheck className="w-6 h-6 text-emerald-600 mr-3" />
+                                <div>
+                                    <h3 className="text-emerald-800 font-bold">{t("safe_status")}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Location Status Banner */}
+                    {locationLoading && (
+                        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl">
+                            <div className="flex items-center">
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
+                                <div>
+                                    <h3 className="text-blue-800 font-bold">Getting your location...</h3>
+                                    <p className="text-blue-600 text-sm">Please allow location access when prompted</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {locationError && (
+                        <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-xl">
+                            <div className="flex items-center">
+                                <AlertTriangle className="w-6 h-6 text-yellow-600 mr-3" />
+                                <div>
+                                    <h3 className="text-yellow-800 font-bold">Location Access Issue</h3>
+                                    <p className="text-yellow-700 text-sm">{locationError}</p>
+                                    <p className="text-yellow-600 text-xs mt-1">
+                                        💡 Tip: Check your browser's address bar for location permission prompt
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Map Section */}
+                        <div className="lg:col-span-2 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center">
+                                    <MapIcon className="w-5 h-5 text-emerald-500 mr-2" />
+                                    <h2 className="text-lg font-semibold text-gray-700">{t("live_map")}</h2>
+                                </div>
+                                {userLocation && (
+                                    <span className="flex items-center text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                                        <span className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></span>
+                                        Location Active
+                                    </span>
+                                )}
+                            </div>
+                            <MapView userLocation={userLocation} elephantLocation={elephantLocation} />
+                        </div>
+
+                        {/* Notifications Section */}
+                        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 h-fit max-h-[600px] overflow-y-auto">
+                            <div className="flex items-center justify-between mb-4 sticky top-0 bg-white pb-2 border-b border-gray-100">
+                                <div className="flex items-center">
+                                    <Bell className="w-5 h-5 text-emerald-500 mr-2" />
+                                    <h2 className="text-lg font-semibold text-gray-700">{t("notifications")}</h2>
+                                </div>
+                                <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                    {notifications.length}
+                                </span>
+                            </div>
+
+                            <div className="space-y-3">
+                                {notifications.length > 0 ? (
+                                    notifications.map((notif) => (
+                                        <div
+                                            key={notif.id}
+                                            className={`p-3 rounded-xl border-l-4 ${notif.type === 'warning' ? 'border-amber-500 bg-amber-50' : 'border-blue-500 bg-blue-50'
+                                                }`}
+                                        >
+                                            <p className="text-sm font-medium text-gray-800">{notif.message}</p>
+                                            <p className="text-xs text-gray-500 mt-1">{notif.time}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-8">
+                                        <Bell className="w-12 h-12 text-gray-200 mx-auto mb-2" />
+                                        <p className="text-gray-400 text-sm">{t("no_notifications")}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     );
 }
+

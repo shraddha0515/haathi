@@ -1,63 +1,157 @@
-// src/components/Sidebar.jsx
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
-import { LayoutDashboard, BarChart3, Rss, ChevronLeft, ChevronRight } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import {
+  Home,
+  History,
+  MapPin,
+  User,
+  Settings,
+  LogOut,
+  ChevronLeft,
+  ChevronRight
+} from "lucide-react";
 
 export default function Sidebar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
-  const navItems = [
-    { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/dashboard" },
-    { name: "Analytics", icon: <BarChart3 size={20} />, path: "/analytics" },
-    { name: "Sensors", icon: <Rss size={20} />, path: "/sensors" },
-  ];
+  // Role-based navigation items
+  const getNavItems = () => {
+    const baseItems = [
+      { name: "Home", icon: <Home size={20} />, path: getHomePath(), roles: ["user", "officer", "admin"] },
+      { name: "History", icon: <History size={20} />, path: "/history", roles: ["user", "officer", "admin"] },
+      { name: "Hotspots", icon: <MapPin size={20} />, path: "/hotspots", roles: ["user", "officer", "admin"] }
+    ];
+
+    // Filter items based on user role
+    return baseItems.filter(item => item.roles.includes(user?.role));
+  };
+
+  const getHomePath = () => {
+    switch (user?.role) {
+      case "admin":
+        return "/admin/dashboard";
+      case "officer":
+        return "/officer/dashboard";
+      case "user":
+        return "/user/home";
+      default:
+        return "/dashboard";
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  const handleProfileClick = () => {
+    navigate("/profile");
+  };
+
+  const navItems = getNavItems();
 
   return (
     <div
       className={`${
         collapsed ? "w-20" : "w-64"
-      } bg-green-700 text-white h-screen flex flex-col transition-all duration-300 shadow-lg`}
+      } bg-gradient-to-b from-gray-800 to-gray-900 text-white h-screen flex flex-col transition-all duration-300 shadow-2xl relative`}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-4 border-b border-green-600">
-        {!collapsed && (
-          <div>
-            <h1 className="text-lg font-semibold">Airavata</h1>
-            <p className="text-xs text-green-100">Command Center</p>
-          </div>
-        )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1 rounded hover:bg-green-600"
-        >
-          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-        </button>
+      {/* Toggle Button */}
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="absolute -right-1 top-8 bg-gray-700 hover:bg-gray-600 text-white rounded-full p-1.5 shadow-lg transition-all z-10"
+      >
+        {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+      </button>
+
+      {/* Header - Logo + Airavat */}
+      <div className="px-4 py-6 border-b border-gray-700">
+        <div className="flex items-center gap-3">
+          {/* <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/375/375048.png"
+              alt="Logo"
+              className="w-6 h-6"
+            />
+          </div> */}
+          {!collapsed && (
+            <div>
+              <h1 className="text-lg font-bold text-white">Airavat</h1>
+              <p className="text-xs text-gray-400">Monitoring System</p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 mt-6">
+      {/* Middle - Navigation */}
+      <nav className="flex-1 mt-4 px-3 space-y-1">
         {navItems.map((item) => (
           <NavLink
             key={item.name}
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 transition-colors ${
+              `flex items-center gap-3 px-3 py-3 rounded-lg transition-all ${
                 isActive
-                  ? "bg-green-600 text-white"
-                  : "text-green-100 hover:bg-green-600 hover:text-white"
-              }`
+                  ? "bg-purple-600 text-white shadow-lg"
+                  : "text-gray-300 hover:bg-gray-700 hover:text-white"
+              } ${collapsed ? "justify-center" : ""}`
             }
           >
-            {item.icon}
+            <span className="flex-shrink-0">{item.icon}</span>
             {!collapsed && <span className="text-sm font-medium">{item.name}</span>}
           </NavLink>
         ))}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-green-600 text-xs text-green-100">
-        {!collapsed && "System Online"}
-        {collapsed && <div className="w-3 h-3 bg-green-400 rounded-full mx-auto"></div>}
+      {/* Bottom - Profile + Name + Role */}
+      <div className="border-t border-gray-700 p-4">
+        {/* Profile Section */}
+        <div
+          onClick={handleProfileClick}
+          className={`flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 cursor-pointer transition-all mb-2 ${
+            collapsed ? "justify-center" : ""
+          }`}
+        >
+          <div className="w-10 h-10 bg-gradient-to-br from-gray-600 to-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
+            <User size={20} className="text-gray-200" />
+          </div>
+          {!collapsed && (
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-white truncate">
+                {user?.name || "User"}
+              </p>
+              <p className="text-xs text-gray-400 capitalize">
+                {user?.role || "guest"}
+              </p>
+            </div>
+          )}
+          {!collapsed && (
+            <Settings size={16} className="text-gray-400 hover:text-white transition-colors" />
+          )}
+        </div>
+
+        {/* Logout Button */}
+        {!collapsed && (
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-all"
+          >
+            <LogOut size={18} />
+            <span className="text-sm font-medium">Logout</span>
+          </button>
+        )}
+
+        {collapsed && (
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center p-2 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-all"
+            title="Logout"
+          >
+            <LogOut size={18} />
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1,10 +1,16 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { SocketProvider } from "./context/SocketContext";
+import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
 import Sensors from "./pages/Sensors";
+import History from "./pages/History";
+import Hotspots from "./pages/Hotspots";
+import Profile from "./pages/Profile";
 import SetupWelcome from "./pages/SetupWelcome";
 import SetupDepartment from "./pages/SetupDepartment";
 import SetupConfiguration from "./pages/SetupConfiguration";
@@ -18,18 +24,16 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
-function App() {
+function AppContent() {
   return (
-    <Router>
+    <>
       <Routes>
         {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        
-        {/* Redirect root to login if not authenticated */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* Setup Wizard Routes (Optional - can be protected if needed) */}
+        {/* Setup Wizard Routes */}
         <Route path="/setup/welcome" element={<SetupWelcome />} />
         <Route path="/setup/department" element={<SetupDepartment />} />
         <Route path="/setup/configuration" element={<SetupConfiguration />} />
@@ -74,33 +78,63 @@ function App() {
           }
         >
           {/* General Dashboard - accessible to officer and admin */}
-          <Route 
-            path="dashboard" 
+          <Route
+            path="dashboard"
             element={
               <RoleBasedRoute allowedRoles={["officer", "admin"]}>
                 <Dashboard />
               </RoleBasedRoute>
-            } 
+            }
           />
-          
+
           {/* Analytics - accessible to officer and admin */}
-          <Route 
-            path="analytics" 
+          <Route
+            path="analytics"
             element={
               <RoleBasedRoute allowedRoles={["officer", "admin"]}>
                 <Analytics />
               </RoleBasedRoute>
-            } 
+            }
           />
-          
+
           {/* Sensors - accessible to officer and admin */}
-          <Route 
-            path="sensors" 
+          <Route
+            path="sensors"
             element={
               <RoleBasedRoute allowedRoles={["officer", "admin"]}>
                 <Sensors />
               </RoleBasedRoute>
-            } 
+            }
+          />
+
+          {/* History - accessible to all authenticated users */}
+          <Route
+            path="history"
+            element={
+              <PrivateRoute>
+                <History />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Hotspots - accessible to all authenticated users */}
+          <Route
+            path="hotspots"
+            element={
+              <PrivateRoute>
+                <Hotspots />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Profile - accessible to all authenticated users */}
+          <Route
+            path="profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
           />
         </Route>
 
@@ -109,8 +143,8 @@ function App() {
       </Routes>
 
       {/* Toast Notifications */}
-      <ToastContainer 
-        position="top-right" 
+      <ToastContainer
+        position="top-right"
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop={true}
@@ -121,7 +155,7 @@ function App() {
         pauseOnHover
         theme="light"
       />
-    </Router>
+    </>
   );
 }
 
@@ -131,7 +165,7 @@ function NotFound() {
   const role = localStorage.getItem("role");
 
   const handleGoHome = () => {
-    switch(role) {
+    switch (role) {
       case "admin":
         navigate("/admin/dashboard");
         break;
@@ -142,7 +176,7 @@ function NotFound() {
         navigate("/user/home");
         break;
       default:
-        navigate("/login");
+        navigate("/");
     }
   };
 
@@ -165,10 +199,22 @@ function NotFound() {
           onClick={handleGoHome}
           className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg"
         >
-          Go to Dashboard
+          Go Home
         </button>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <SocketProvider>
+          <AppContent />
+        </SocketProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
