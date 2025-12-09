@@ -4,10 +4,8 @@ import {
   Shield, MapPin, Bell, Smartphone, Users, TrendingUp,
   Zap, Globe, CheckCircle, ArrowRight, Menu, X
 } from "lucide-react";
-
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-
   const features = [
     {
       icon: <MapPin className="w-8 h-8" />,
@@ -40,14 +38,12 @@ export default function LandingPage() {
       description: "Empower local communities with timely information to prevent conflicts."
     }
   ];
-
   const stats = [
     { value: "24/7", label: "Real-Time Monitoring" },
     { value: "500m+", label: "Alert Radius Coverage" },
     { value: "Multi-Role", label: "Access Control" },
     { value: "Instant", label: "Push Notifications" }
   ];
-
   const uniqueFeatures = [
     "PostGIS-powered geospatial analysis for accurate proximity detection",
     "WebSocket integration for real-time event broadcasting",
@@ -56,14 +52,13 @@ export default function LandingPage() {
     "Automatic token refresh for seamless 7-day sessions",
     "Customizable alert zones with multiple risk levels"
   ];
-
   return (
     <div className="min-h-screen bg-white">
-      {/* Navigation */}
+      {}
       <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-sm z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
+            {}
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
                 <img
@@ -76,8 +71,7 @@ export default function LandingPage() {
                 Airavata
               </span>
             </div>
-
-            {/* Desktop Menu */}
+            {}
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-gray-700 hover:text-emerald-600 transition-colors">Features</a>
               <a href="#why-us" className="text-gray-700 hover:text-emerald-600 transition-colors">Why Us</a>
@@ -89,8 +83,7 @@ export default function LandingPage() {
                 Get Started
               </Link>
             </div>
-
-            {/* Mobile Menu Button */}
+            {}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-gray-100"
@@ -99,8 +92,7 @@ export default function LandingPage() {
             </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
+        {}
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t">
             <div className="px-4 py-4 space-y-3">
@@ -117,12 +109,11 @@ export default function LandingPage() {
           </div>
         )}
       </nav>
-
-      {/* Hero Section */}
+      {}
       <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-emerald-50 via-teal-50 to-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
+            {}
             <div className="space-y-6">
               <div className="inline-block px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">
                 Human-Elephant Conflict Prevention
@@ -152,8 +143,7 @@ export default function LandingPage() {
                 </a>
               </div>
             </div>
-
-            {/* Right Image */}
+            {}
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img
@@ -167,11 +157,9 @@ export default function LandingPage() {
                   <p className="text-sm opacity-90">Real-time monitoring • Smart alerts • Community safety</p>
                 </div>
               </div>
-             
             </div>
           </div>
-
-          {/* Stats Bar */}
+          {}
           <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((stat, index) => (
               <div key={index} className="text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
@@ -182,8 +170,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* What is Project Airavata */}
+      {}
       <section id="about" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -198,7 +185,6 @@ export default function LandingPage() {
                 <p className="font-semibold">Powered by cutting-edge IoT, GPS, and geospatial technology</p>
               </div>
             </div>
-
             <div className="space-y-6">
               <h2 className="text-4xl font-bold text-gray-900">
                 What is Project Airavata?
@@ -225,8 +211,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* Why We Are Unique */}
+      {}
       <section id="why-us" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-emerald-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -237,7 +222,6 @@ export default function LandingPage() {
               We combine advanced technology with practical solutions to create a system that actually works in the field.
             </p>
           </div>
-
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {uniqueFeatures.map((feature, index) => (
               <div key={index} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition-all group">
@@ -248,7 +232,6 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-
           <div className="mt-16 bg-white rounded-2xl shadow-xl overflow-hidden">
             <div className="grid md:grid-cols-3">
               <div className="p-8 bg-gradient-to-br from-emerald-600 to-teal-600 text-white">
@@ -270,8 +253,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* Key Features */}
+      {}
       <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -282,7 +264,6 @@ export default function LandingPage() {
               Everything you need to prevent human-elephant conflicts and protect communities.
             </p>
           </div>
-
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <div key={index} className="group p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-sm hover:shadow-xl transition-all border border-gray-100 hover:border-emerald-200">
@@ -296,8 +277,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* CTA Section */}
+      {}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-emerald-600 to-teal-600">
         <div className="max-w-4xl mx-auto text-center text-white">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -322,12 +302,11 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
+      {}
       <footer className="bg-gray-900 text-gray-300 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8 mb-8">
-            {/* Brand */}
+            {}
             <div className="col-span-1">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
@@ -343,7 +322,6 @@ export default function LandingPage() {
                 Protecting communities and wildlife through intelligent technology.
               </p>
             </div>
-
             <div>
               <h4 className="text-white font-semibold mb-4">Airavata</h4>
               <ul className="space-y-2 text-sm">
@@ -353,7 +331,6 @@ export default function LandingPage() {
               </ul>
             </div>
           </div>
-
           <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-gray-400">
               © {new Date().getFullYear()} Project Airavata. By Team Saksham 2.0.

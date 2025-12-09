@@ -3,9 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Eye, EyeOff, Lock, Mail, Loader2, AlertCircle } from "lucide-react";
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URI || "https://sih-saksham.onrender.com";
-
 export default function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -15,34 +13,27 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
-  // Validation function
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.email) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Email is invalid";
     }
-    
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -50,17 +41,12 @@ export default function Login() {
       }));
     }
   };
-
   const handleLogin = async (e) => {
     e.preventDefault();
-    
-    // Validate form
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
-
     try {
       const res = await axios.post(
         `${API_BASE_URL}/api/auth/login`,
@@ -72,21 +58,14 @@ export default function Login() {
           }
         }
       );
-
       const { accessToken, user } = res.data;
-
       if (!accessToken || !user) {
         throw new Error("Invalid response from server");
       }
-
-      // Store auth data
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("role", user.role);
-
       toast.success(`Welcome back, ${user.name}!`);
-
-      // Role-based navigation
       switch (user.role) {
         case "admin":
           navigate("/admin/dashboard");
@@ -102,12 +81,9 @@ export default function Login() {
       }
     } catch (err) {
       console.error("Login error:", err);
-      
       if (err.response) {
-        // Server responded with error
         const message = err.response.data?.message || "Login failed";
         toast.error(message);
-        
         if (err.response.status === 401) {
           setErrors({ general: "Invalid email or password" });
         } else if (err.response.status === 404) {
@@ -116,11 +92,9 @@ export default function Login() {
           setErrors({ general: message });
         }
       } else if (err.request) {
-        // Request made but no response
         toast.error("Unable to connect to server. Please check your internet connection.");
         setErrors({ general: "Network error. Please try again." });
       } else {
-        // Something else happened
         toast.error("An unexpected error occurred");
         setErrors({ general: err.message });
       }
@@ -128,14 +102,12 @@ export default function Login() {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-50 px-4 py-8">
-      {/* Background Pattern */}
+      {}
       <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
-      
       <div className="w-full max-w-md relative z-10">
-        {/* Logo & Title */}
+        {}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg mb-4 transform hover:scale-105 transition-transform">
             <img
@@ -147,25 +119,22 @@ export default function Login() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Project Airavata</h1>
           <p className="text-gray-600 text-sm">Human-Elephant Conflict Prevention System</p>
         </div>
-
-        {/* Login Card */}
+        {}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
             <p className="text-gray-500 text-sm mt-1">Sign in to access your dashboard</p>
           </div>
-
-          {/* General Error Message */}
+          {}
           {errors.general && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
               <AlertCircle className="w-5 h-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-red-700">{errors.general}</p>
             </div>
           )}
-
-          {/* Form */}
+          {}
           <form onSubmit={handleLogin} className="space-y-5">
-            {/* Email Field */}
+            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
@@ -191,8 +160,7 @@ export default function Login() {
                 </p>
               )}
             </div>
-
-            {/* Password Field */}
+            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -230,8 +198,7 @@ export default function Login() {
                 </p>
               )}
             </div>
-
-            {/* Remember Me & Forgot Password */}
+            {}
             <div className="flex items-center justify-between">
               <label className="flex items-center">
                 <input
@@ -247,8 +214,7 @@ export default function Login() {
                 Forgot password?
               </Link>
             </div>
-
-            {/* Submit Button */}
+            {}
             <button
               type="submit"
               disabled={loading}
@@ -264,8 +230,7 @@ export default function Login() {
               )}
             </button>
           </form>
-
-          {/* Divider */}
+          {}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200"></div>
@@ -274,7 +239,6 @@ export default function Login() {
               <span className="px-4 bg-white text-gray-500">Don't have an account?</span>
             </div>
           </div>
-
           {/* Signup Link */}
           <Link
             to="/signup"
@@ -283,7 +247,6 @@ export default function Login() {
             Create Account
           </Link>
         </div>
-
         {/* Footer */}
         <p className="mt-8 text-center text-xs text-gray-400">
           &copy; {new Date().getFullYear()} Forest Department. All rights reserved.

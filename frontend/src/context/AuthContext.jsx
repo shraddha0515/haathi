@@ -1,11 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URI || "https://sih-saksham.onrender.com";
-
 const AuthContext = createContext();
-
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -13,23 +10,18 @@ export const useAuth = () => {
   }
   return context;
 };
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
-
-  // Initialize auth state from localStorage
   useEffect(() => {
     initializeAuth();
   }, []);
-
   const initializeAuth = () => {
     try {
       const token = localStorage.getItem("accessToken");
       const userData = localStorage.getItem("user");
-
       if (token && userData) {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
@@ -42,31 +34,22 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
-
   const login = async (email, password) => {
     try {
       const res = await axiosInstance.post(
         `/api/auth/login`,
         { email, password }
       );
-
       const { accessToken, user: userData } = res.data;
-
       if (!accessToken || !userData) {
         throw new Error("Invalid response from server");
       }
-
-      // Store auth data
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("role", userData.role);
-
       setUser(userData);
       setIsAuthenticated(true);
-
-      // Role-based navigation
       navigateByRole(userData.role);
-
       return { success: true, user: userData };
     } catch (error) {
       console.error("Login error:", error);
@@ -76,31 +59,22 @@ export const AuthProvider = ({ children }) => {
       };
     }
   };
-
   const register = async (name, email, password, role = "user") => {
     try {
       const res = await axiosInstance.post(
         `/api/auth/register`,
         { name, email, password, role }
       );
-
       const { accessToken, user: userData } = res.data;
-
       if (!accessToken || !userData) {
         throw new Error("Invalid response from server");
       }
-
-      // Store auth data
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("role", userData.role);
-
       setUser(userData);
       setIsAuthenticated(true);
-
-      // Role-based navigation
       navigateByRole(userData.role);
-
       return { success: true, user: userData };
     } catch (error) {
       console.error("Register error:", error);
@@ -110,7 +84,6 @@ export const AuthProvider = ({ children }) => {
       };
     }
   };
-
   const logout = async () => {
     try {
       await axiosInstance.post(`/api/auth/logout`);
@@ -121,7 +94,6 @@ export const AuthProvider = ({ children }) => {
       navigate("/login");
     }
   };
-
   const clearAuth = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
@@ -129,7 +101,6 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
   };
-
   const navigateByRole = (role) => {
     switch (role) {
       case "admin":
@@ -145,13 +116,11 @@ export const AuthProvider = ({ children }) => {
         navigate("/dashboard");
     }
   };
-
   const updateUser = (updatedData) => {
     const updatedUser = { ...user, ...updatedData };
     setUser(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
   };
-
   const value = {
     user,
     loading,
@@ -162,6 +131,5 @@ export const AuthProvider = ({ children }) => {
     updateUser,
     clearAuth
   };
-
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

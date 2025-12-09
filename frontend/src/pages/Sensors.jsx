@@ -1,6 +1,5 @@
 import React from "react";
 import { Wifi, MapPin, Battery, CheckCircle, XCircle } from "lucide-react";
-
 export default function Sensors() {
   const sensors = [
     {
@@ -12,14 +11,12 @@ export default function Sensors() {
       lastSignal: "2 min ago",
     },
   ];
-
   return (
     <div className="p-6 bg-green-50 min-h-screen">
       <h2 className="text-2xl font-semibold text-green-700 mb-2">Sensor Overview</h2>
       <p className="text-gray-600 mb-6 text-sm">
         Monitor all deployed IoT sensors and their live status.
       </p>
-
       <div className="bg-white rounded-lg shadow-md border border-green-200 overflow-hidden">
         <table className="w-full text-sm text-left text-gray-700">
           <thead className="bg-green-700 text-white uppercase text-xs">
@@ -69,8 +66,7 @@ export default function Sensors() {
           </tbody>
         </table>
       </div>
-
-      {/* Map Preview Placeholder */}
+      {}
       <div className="mt-8 bg-white border border-green-200 rounded-lg p-6 shadow-inner text-center">
         <p className="text-gray-500">
           🗺️ Map preview of sensor positions will appear here (Leaflet integration pending)

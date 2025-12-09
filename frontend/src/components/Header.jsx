@@ -1,7 +1,5 @@
-// src/components/Header.jsx
 import React from "react";
 import { Bell, Calendar, UserCircle } from "lucide-react";
-
 export default function Header() {
   const today = new Date().toLocaleString("en-IN", {
     weekday: "short",
@@ -11,29 +9,22 @@ export default function Header() {
     hour: "2-digit",
     minute: "2-digit",
   });
-
   return (
     <header className="flex items-center justify-between bg-white shadow-sm border-b border-green-200 px-6 py-3 sticky top-0 z-50">
-      {/* Left side */}
+      {}
       <div className="flex items-center gap-3">
-        {/* <img
-          src="https://cdn-icons-png.flaticon.com/512/616/616408.png"
-          alt="Airavata Logo"
-          className="w-8 h-8"
-        /> */}
+        {}
         <div>
           <h1 className="text-green-700 font-semibold text-lg">Project Airavata</h1>
           <p className="text-xs text-gray-500 -mt-1">HEC Command Center</p>
         </div>
       </div>
-
-      {/* Center — Date / Time */}
+      {}
       <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-full px-3 py-1 text-sm text-green-700">
         <Calendar size={16} />
         {today}
       </div>
-
-      {/* Right side — Notification & Profile */}
+      {}
       <div className="flex items-center gap-5">
         <div className="relative cursor-pointer">
           <Bell className="text-green-700 hover:text-green-800" size={22} />
@@ -41,7 +32,6 @@ export default function Header() {
             3
           </span>
         </div>
-
         <div className="cursor-pointer">
           <UserCircle className="text-green-700 hover:text-green-800" size={26} />
         </div>

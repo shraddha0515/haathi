@@ -8,6 +8,7 @@ import notificationRoutes from "./src/routes/notifications.js";
 import eventRoutes from "./src/routes/eventRoutes.js";
 import deviceRoutes from "./src/routes/devices.js";
 import hotspotRoutes from "./src/routes/hotspots.js";
+import userRoutes from "./src/routes/users.js";
 
 dotenv.config();
 
@@ -85,6 +86,7 @@ app.use("/api/devices", deviceRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/hotspots", hotspotRoutes);
+app.use("/api/users", userRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Backend is running" });

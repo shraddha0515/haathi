@@ -12,9 +12,7 @@ import {
   Cell,
   Legend,
 } from "recharts";
-
 export default function Analytics() {
-  // 📊 Mock Data for Single Device (SEN-001)
   const monthlyConflicts = [
     { month: "Jan", conflicts: 2 },
     { month: "Feb", conflicts: 1 },
@@ -23,18 +21,15 @@ export default function Analytics() {
     { month: "May", conflicts: 1 },
     { month: "Jun", conflicts: 0 },
   ];
-
   const conflictTypes = [
     { name: "Crop Damage", value: 60 },
     { name: "Property Loss", value: 20 },
     { name: "Forest Damage", value: 20 },
   ];
-
   const COLORS = ["#16a34a", "#4ade80", "#86efac"];
-
   return (
     <div className="h-full w-full p-6 bg-green-50 overflow-y-auto">
-      {/* Header Section */}
+      {}
       <div className="mb-6">
         <h2 className="text-2xl font-semibold text-green-700">
           Analytics Overview (Device: SEN-001)
@@ -43,8 +38,7 @@ export default function Analytics() {
           Visual insights from AI-powered elephant movement and conflict data for Forest Zone A
         </p>
       </div>
-
-      {/* Top Stats */}
+      {}
       <div className="grid grid-cols-4 gap-4 mb-8">
         {[
           { title: "Total Conflicts", value: 34, color: "text-red-600" },
@@ -63,10 +57,9 @@ export default function Analytics() {
           </div>
         ))}
       </div>
-
-      {/* Charts Section */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Monthly Conflict Trend */}
+        {}
         <div className="bg-white p-6 shadow-md rounded-lg border border-green-200">
           <h3 className="text-lg font-semibold text-green-700 mb-4">
             Monthly Conflict Trends
@@ -81,8 +74,7 @@ export default function Analytics() {
             </BarChart>
           </ResponsiveContainer>
         </div>
-
-        {/* Conflict Type Distribution */}
+        {}
         <div className="bg-white p-6 shadow-md rounded-lg border border-green-200">
           <h3 className="text-lg font-semibold text-green-700 mb-4">
             Conflict Type Distribution

@@ -3,20 +3,16 @@ import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { Clock, MapPin, AlertTriangle, Info, Filter, Search } from "lucide-react";
 import { toast } from "react-toastify";
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URI || "https://sih-saksham.onrender.com";
-
 export default function History() {
   const { user } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("all"); // all, alert, info
+  const [filter, setFilter] = useState("all"); 
   const [searchTerm, setSearchTerm] = useState("");
-
   useEffect(() => {
     fetchHistory();
   }, []);
-
   const fetchHistory = async () => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -31,7 +27,6 @@ export default function History() {
       setLoading(false);
     }
   };
-
   const getEventIcon = (type) => {
     switch (type) {
       case "alert":
@@ -42,7 +37,6 @@ export default function History() {
         return <MapPin className="text-gray-500" size={20} />;
     }
   };
-
   const getEventColor = (type) => {
     switch (type) {
       case "alert":
@@ -53,14 +47,12 @@ export default function History() {
         return "border-l-gray-500 bg-gray-50";
     }
   };
-
   const filteredEvents = events
     .filter(event => filter === "all" || event.type === filter)
     .filter(event =>
       event.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.location?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -71,20 +63,18 @@ export default function History() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
+        {}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Event History</h1>
           <p className="text-gray-600">View all past events and alerts</p>
         </div>
-
-        {/* Filters and Search */}
+        {}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
+            {}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
@@ -95,8 +85,7 @@ export default function History() {
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
-
-            {/* Filter */}
+            {}
             <div className="flex gap-2">
               <button
                 onClick={() => setFilter("all")}
@@ -131,8 +120,7 @@ export default function History() {
             </div>
           </div>
         </div>
-
-        {/* Events List */}
+        {}
         <div className="space-y-4">
           {filteredEvents.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm p-12 text-center">

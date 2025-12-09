@@ -5,31 +5,24 @@ import L from "leaflet";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-
-// Fix for default marker icon issues in React Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
   iconUrl: markerIcon,
   shadowUrl: markerShadow,
 });
-
-// Custom Icons
 const elephantIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/375/375048.png", // Elephant icon
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/375/375048.png", 
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
 });
-
 const userIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/9131/9131546.png", // Person icon
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/9131/9131546.png", 
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
 });
-
-// Component to center map on updates
 function MapUpdater({ center }) {
   const map = useMap();
   useEffect(() => {
@@ -39,10 +32,8 @@ function MapUpdater({ center }) {
   }, [center, map]);
   return null;
 }
-
 export default function MapView({ userLocation, elephantLocation }) {
-  const defaultCenter = [21.34, 82.75]; // Default fallback
-
+  const defaultCenter = [21.34, 82.75]; 
   return (
     <div className="w-full h-[500px] rounded-xl border border-emerald-200 shadow-inner overflow-hidden relative z-0">
       <MapContainer
@@ -54,8 +45,7 @@ export default function MapView({ userLocation, elephantLocation }) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
-
-        {/* User Marker */}
+        {}
         {userLocation && (
           <Marker position={userLocation} icon={userIcon}>
             <Popup>
@@ -66,8 +56,7 @@ export default function MapView({ userLocation, elephantLocation }) {
             </Popup>
           </Marker>
         )}
-
-        {/* Elephant Marker */}
+        {}
         {elephantLocation && (
           <Marker position={elephantLocation} icon={elephantIcon}>
             <Popup>
@@ -78,7 +67,6 @@ export default function MapView({ userLocation, elephantLocation }) {
             </Popup>
           </Marker>
         )}
-
         <MapUpdater center={userLocation || elephantLocation || defaultCenter} />
       </MapContainer>
     </div>

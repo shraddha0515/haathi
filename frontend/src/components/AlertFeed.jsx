@@ -1,11 +1,9 @@
 import "./AlertFeed.css";
 import React from "react";
-
 export default function AlertFeed({ alerts = [] }) {
   return (
     <div className="alert-feed">
       <h3>⚠ Recent Alerts</h3>
-
       {alerts.length === 0 ? (
         <p>No alerts yet</p>
       ) : (

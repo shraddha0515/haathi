@@ -2,7 +2,6 @@ import db from "../config/db.js";
 import { io } from "../../server.js";
 import { sendPushNotification } from './notificationController.js';
 import { checkProximityAlerts } from './hotspotController.js';
-
 export const receiveEvent = async (req, res) => {
   try {
     const {
@@ -12,7 +11,6 @@ export const receiveEvent = async (req, res) => {
       confidence,
       battery_percentage
     } = req.body;
-
     if (!device_id || typeof latitude !== "number" || typeof longitude !== "number") {
       return res.status(400).json({
         error: "device_id, latitude, longitude are required"
@@ -24,7 +22,6 @@ export const receiveEvent = async (req, res) => {
     VALUES ($1, $2, $3, ST_SetSRID(ST_Point($3, $2), 4326), $4, $5)
     RETURNING *;
   `;
-
       const values = [
       device_id,
       latitude,
@@ -32,10 +29,8 @@ export const receiveEvent = async (req, res) => {
       confidence || null,
       battery_percentage || null
     ];
-
     const result = await db.query(insertQuery, values);
     const data = result.rows[0];
-
     await db.query(
       `
       UPDATE devices
@@ -47,12 +42,9 @@ export const receiveEvent = async (req, res) => {
       `,
       [battery_percentage || null, device_id]
     );
-
     io.emit("new_event", data);
-
      const userResult = await db.query(`SELECT id FROM users`);
      const userIds = userResult.rows.map(row => row.id);
- 
      await sendPushNotification(
        userIds,
        'Elephant Detected!',
@@ -65,7 +57,6 @@ export const receiveEvent = async (req, res) => {
          type: 'elephant_detection'
        }
      );
- 
     await db.query(
       `INSERT INTO notifications (user_id, title, body, data)
        SELECT id, $1, $2, $3 FROM users`,
@@ -80,26 +71,19 @@ export const receiveEvent = async (req, res) => {
         })
       ]
     );
-
     await checkProximityAlerts(latitude, longitude, device_id);
-
     return res.status(201).json({
       message: "Event stored & broadcasted",
       data
     });
-
   } catch (err) {
     console.error("Error receiving event:", err);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-
-
-
 export const getLatestEvent = async (req, res) => {
   try {
     const { device_id } = req.params;
-
     const query = `
       SELECT *
       FROM detections
@@ -107,26 +91,18 @@ export const getLatestEvent = async (req, res) => {
       ORDER BY detected_at DESC
       LIMIT 1;
     `;
-
     const result = await db.query(query, [device_id]);
-
     if (result.rows.length === 0)
       return res.status(404).json({ error: "No events found" });
-
     res.json(result.rows[0]);
-
   } catch (err) {
     console.error("Latest event error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
-
-
 export const getEventHistory = async (req, res) => {
   try {
     const { device_id } = req.params;
-
     const query = `
       SELECT *
       FROM detections
@@ -134,18 +110,13 @@ export const getEventHistory = async (req, res) => {
       ORDER BY detected_at DESC
       LIMIT 500; 
     `;
-
     const result = await db.query(query, [device_id]);
     res.json(result.rows);
-
   } catch (err) {
     console.error("Event history error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
-
-
 export const getAllEvents = async (req, res) => {
   try {
     const query = `
@@ -153,10 +124,8 @@ export const getAllEvents = async (req, res) => {
       FROM detections
       ORDER BY detected_at DESC;
     `;
-
     const result = await db.query(query);
     res.json(result.rows);
-
   } catch (err) {
     console.error("Get all events error:", err);
     res.status(500).json({ error: "Internal server error" });

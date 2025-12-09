@@ -6,7 +6,6 @@ import MapView from "../components/MapView";
 import { Bell, Map as MapIcon, AlertTriangle, ShieldCheck, Globe } from "lucide-react";
 import axios from "axios";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URI || "https://sih-saksham.onrender.com";
-
 export default function UserDashboard() {
     const { t, i18n } = useTranslation();
     const { latestEvent } = useSocket();
@@ -16,15 +15,12 @@ export default function UserDashboard() {
     const [isSafe, setIsSafe] = useState(true);
     const [locationError, setLocationError] = useState(null);
     const [locationLoading, setLocationLoading] = useState(true);
-
-    // 1. Get User Location with better error handling
     useEffect(() => {
         if (!navigator.geolocation) {
             setLocationError("Geolocation is not supported by your browser");
             setLocationLoading(false);
             return;
         }
-
         const watchId = navigator.geolocation.watchPosition(
             (position) => {
                 setUserLocation([position.coords.latitude, position.coords.longitude]);
@@ -57,20 +53,14 @@ export default function UserDashboard() {
                 maximumAge: 0
             }
         );
-
         return () => navigator.geolocation.clearWatch(watchId);
     }, []);
-
-    // 2. Handle Real-time Events (Socket)
     useEffect(() => {
         if (latestEvent) {
-            // Update Elephant Location
             if (latestEvent.latitude && latestEvent.longitude) {
                 setElephantLocation([latestEvent.latitude, latestEvent.longitude]);
-                setIsSafe(false); // Assume danger if event received
+                setIsSafe(false); 
             }
-
-            // Add to notifications
             const newNotif = {
                 id: Date.now(),
                 message: `Elephant detected at ${latestEvent.latitude.toFixed(4)}, ${latestEvent.longitude.toFixed(4)}`,
@@ -80,16 +70,11 @@ export default function UserDashboard() {
             setNotifications((prev) => [newNotif, ...prev]);
         }
     }, [latestEvent]);
-
-    // 3. Initial Fetch of Latest Event (API)
     useEffect(() => {
         const fetchLatest = async () => {
             try {
-                // Fetching all events for now to get the latest one
                 const res = await axios.get(`${API_BASE_URL}/api/events`);
                 if (res.data && res.data.length > 0) {
-                    // Assuming the API returns an array and we take the first one as latest
-                    // Or sort by timestamp if needed. For now taking the first one.
                     const latest = res.data[0];
                     if (latest.latitude && latest.longitude) {
                         setElephantLocation([latest.latitude, latest.longitude]);
@@ -101,23 +86,20 @@ export default function UserDashboard() {
         };
         fetchLatest();
     }, []);
-
     const toggleLanguage = () => {
         i18n.changeLanguage(i18n.language === "en" ? "hi" : "en");
     };
-
     return (
         <div className="flex h-screen bg-gray-50">
             <Sidebar />
             <div className="flex-1 overflow-y-auto">
                 <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
-                    {/* Header */}
+                    {}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
                             <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{t("dashboard_title")}</h1>
                             <p className="text-gray-500 text-sm mt-1">{t("welcome")}, User</p>
                         </div>
-
                         <div className="flex items-center space-x-3">
                             <button
                                 onClick={toggleLanguage}
@@ -131,8 +113,7 @@ export default function UserDashboard() {
                             </span>
                         </div>
                     </div>
-
-                    {/* Safety Alert Banner */}
+                    {}
                     {!isSafe ? (
                         <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl animate-pulse">
                             <div className="flex items-center">
@@ -153,8 +134,7 @@ export default function UserDashboard() {
                             </div>
                         </div>
                     )}
-
-                    {/* Location Status Banner */}
+                    {}
                     {locationLoading && (
                         <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl">
                             <div className="flex items-center">
@@ -166,7 +146,6 @@ export default function UserDashboard() {
                             </div>
                         </div>
                     )}
-
                     {locationError && (
                         <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-xl">
                             <div className="flex items-center">
@@ -181,7 +160,6 @@ export default function UserDashboard() {
                             </div>
                         </div>
                     )}
-
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Map Section */}
                         <div className="lg:col-span-2 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
@@ -199,7 +177,6 @@ export default function UserDashboard() {
                             </div>
                             <MapView userLocation={userLocation} elephantLocation={elephantLocation} />
                         </div>
-
                         {/* Notifications Section */}
                         <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 h-fit max-h-[600px] overflow-y-auto">
                             <div className="flex items-center justify-between mb-4 sticky top-0 bg-white pb-2 border-b border-gray-100">
@@ -211,7 +188,6 @@ export default function UserDashboard() {
                                     {notifications.length}
                                 </span>
                             </div>
-
                             <div className="space-y-3">
                                 {notifications.length > 0 ? (
                                     notifications.map((notif) => (
@@ -238,4 +214,3 @@ export default function UserDashboard() {
         </div>
     );
 }
-

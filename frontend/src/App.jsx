@@ -23,22 +23,19 @@ import MainLayout from "./components/MainLayout";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-
 function AppContent() {
   return (
     <>
       <Routes>
-        {/* Public Routes */}
+        {}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-
-        {/* Setup Wizard Routes */}
+        {}
         <Route path="/setup/welcome" element={<SetupWelcome />} />
         <Route path="/setup/department" element={<SetupDepartment />} />
         <Route path="/setup/configuration" element={<SetupConfiguration />} />
-
-        {/* Protected Routes - User Role */}
+        {}
         <Route
           path="/user/home"
           element={
@@ -47,8 +44,7 @@ function AppContent() {
             </RoleBasedRoute>
           }
         />
-
-        {/* Protected Routes - Officer Role */}
+        {}
         <Route
           path="/officer/dashboard"
           element={
@@ -57,8 +53,7 @@ function AppContent() {
             </RoleBasedRoute>
           }
         />
-
-        {/* Protected Routes - Admin Role */}
+        {}
         <Route
           path="/admin/dashboard"
           element={
@@ -67,8 +62,7 @@ function AppContent() {
             </RoleBasedRoute>
           }
         />
-
-        {/* Shared Protected Routes under Layout - All authenticated users */}
+        {}
         <Route
           path="/"
           element={
@@ -77,7 +71,7 @@ function AppContent() {
             </PrivateRoute>
           }
         >
-          {/* General Dashboard - accessible to officer and admin */}
+          {}
           <Route
             path="dashboard"
             element={
@@ -86,8 +80,7 @@ function AppContent() {
               </RoleBasedRoute>
             }
           />
-
-          {/* Analytics - accessible to officer and admin */}
+          {}
           <Route
             path="analytics"
             element={
@@ -96,8 +89,7 @@ function AppContent() {
               </RoleBasedRoute>
             }
           />
-
-          {/* Sensors - accessible to officer and admin */}
+          {}
           <Route
             path="sensors"
             element={
@@ -106,8 +98,7 @@ function AppContent() {
               </RoleBasedRoute>
             }
           />
-
-          {/* History - accessible to all authenticated users */}
+          {}
           <Route
             path="history"
             element={
@@ -116,8 +107,7 @@ function AppContent() {
               </PrivateRoute>
             }
           />
-
-          {/* Hotspots - accessible to all authenticated users */}
+          {}
           <Route
             path="hotspots"
             element={
@@ -126,8 +116,7 @@ function AppContent() {
               </PrivateRoute>
             }
           />
-
-          {/* Profile - accessible to all authenticated users */}
+          {}
           <Route
             path="profile"
             element={
@@ -137,12 +126,10 @@ function AppContent() {
             }
           />
         </Route>
-
-        {/* 404 Not Found - Catch all */}
+        {}
         <Route path="*" element={<NotFound />} />
       </Routes>
-
-      {/* Toast Notifications */}
+      {}
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -158,12 +145,9 @@ function AppContent() {
     </>
   );
 }
-
-// 404 Not Found Component
 function NotFound() {
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
-
   const handleGoHome = () => {
     switch (role) {
       case "admin":
@@ -179,7 +163,6 @@ function NotFound() {
         navigate("/");
     }
   };
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-50 px-4">
       <div className="text-center">
@@ -205,7 +188,6 @@ function NotFound() {
     </div>
   );
 }
-
 function App() {
   return (
     <Router>
@@ -217,5 +199,4 @@ function App() {
     </Router>
   );
 }
-
 export default App;

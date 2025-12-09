@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { Camera, Trash2, LogOut } from "lucide-react";
 import { toast } from "react-toastify";
 
-export default function Profile() {
+export default function Settings() {
   const { user, updateUser, logout } = useAuth();
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -83,9 +83,9 @@ export default function Profile() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
           <p className="text-sm text-gray-500 mt-1">
-            {user?.name} / Profile
+            {user?.name} / Settings
           </p>
         </div>
 
@@ -215,7 +215,16 @@ export default function Profile() {
             </button>
           </div>
 
-        
+          {/* Delete Account Section */}
+          <div className="mt-12 pt-8 border-t border-gray-200">
+            <button
+              onClick={handleDeleteAccount}
+              className="px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+            >
+              Delete Account
+            </button>
+          </div>
+
           {/* Logout Section */}
           <div className="mt-6">
             <button

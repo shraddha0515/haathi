@@ -3,9 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Eye, EyeOff, Lock, Mail, User, Shield, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URI || "https://sih-saksham.onrender.com";
-
 export default function Signup() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -20,8 +18,6 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [passwordStrength, setPasswordStrength] = useState(0);
-
-  // Password strength checker
   const checkPasswordStrength = (password) => {
     let strength = 0;
     if (password.length >= 8) strength++;
@@ -31,52 +27,40 @@ export default function Signup() {
     if (/[^a-zA-Z0-9]/.test(password)) strength++;
     return strength;
   };
-
-  // Validation function
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.name.trim()) {
       newErrors.name = "Name is required";
     } else if (formData.name.trim().length < 2) {
       newErrors.name = "Name must be at least 2 characters";
     }
-    
     if (!formData.email) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Email is invalid";
     }
-    
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
-    
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password";
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-    
-    // Check password strength
     if (name === "password") {
       setPasswordStrength(checkPasswordStrength(value));
     }
-    
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -84,17 +68,12 @@ export default function Signup() {
       }));
     }
   };
-
   const handleSignup = async (e) => {
     e.preventDefault();
-    
-    // Validate form
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
-
     try {
       const res = await axios.post(`${API_BASE_URL}/api/auth/register`, {
         name: formData.name.trim(),
@@ -106,19 +85,14 @@ export default function Signup() {
           'Content-Type': 'application/json'
         }
       });
-
       if (res.status === 200 || res.status === 201) {
         const { accessToken, user } = res.data;
-
         if (accessToken && user) {
           localStorage.setItem("accessToken", accessToken);
           localStorage.setItem("user", JSON.stringify(user));
           localStorage.setItem("role", user.role);
         }
-
         toast.success("Account created successfully! Welcome to Project Airavata 🎉");
-
-        // Role-based navigation
         switch (formData.role) {
           case "admin":
             navigate("/admin/dashboard");
@@ -135,10 +109,8 @@ export default function Signup() {
       }
     } catch (err) {
       console.error("Signup error:", err);
-      
       if (err.response) {
         const message = err.response.data?.message || "Signup failed";
-        
         if (err.response.status === 409 || message.includes("already exists")) {
           toast.error("An account with this email already exists");
           setErrors({ email: "This email is already registered" });
@@ -160,28 +132,24 @@ export default function Signup() {
       setLoading(false);
     }
   };
-
   const getPasswordStrengthColor = () => {
     if (passwordStrength <= 1) return "bg-red-500";
     if (passwordStrength <= 2) return "bg-yellow-500";
     if (passwordStrength <= 3) return "bg-blue-500";
     return "bg-green-500";
   };
-
   const getPasswordStrengthText = () => {
     if (passwordStrength <= 1) return "Weak";
     if (passwordStrength <= 2) return "Fair";
     if (passwordStrength <= 3) return "Good";
     return "Strong";
   };
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-50 px-4 py-8">
-      {/* Background Pattern */}
+      {}
       <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
-      
       <div className="w-full max-w-md relative z-10">
-        {/* Logo & Title */}
+        {}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg mb-4 transform hover:scale-105 transition-transform">
             <img
@@ -193,25 +161,22 @@ export default function Signup() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Join Project Airavata</h1>
           <p className="text-gray-600 text-sm">Create your account to get started</p>
         </div>
-
-        {/* Signup Card */}
+        {}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Create Account</h2>
             <p className="text-gray-500 text-sm mt-1">Fill in your details below</p>
           </div>
-
-          {/* General Error Message */}
+          {}
           {errors.general && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
               <AlertCircle className="w-5 h-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-red-700">{errors.general}</p>
             </div>
           )}
-
-          {/* Form */}
+          {}
           <form onSubmit={handleSignup} className="space-y-4">
-            {/* Name Field */}
+            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Full Name
@@ -237,8 +202,7 @@ export default function Signup() {
                 </p>
               )}
             </div>
-
-            {/* Email Field */}
+            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
@@ -264,8 +228,7 @@ export default function Signup() {
                 </p>
               )}
             </div>
-
-            {/* Password Field */}
+            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -296,8 +259,7 @@ export default function Signup() {
                   )}
                 </button>
               </div>
-              
-              {/* Password Strength Indicator */}
+              {}
               {formData.password && (
                 <div className="mt-2">
                   <div className="flex justify-between items-center mb-1">
@@ -318,7 +280,6 @@ export default function Signup() {
                   </div>
                 </div>
               )}
-              
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600 flex items-center">
                   <AlertCircle className="w-4 h-4 mr-1" />
@@ -326,8 +287,7 @@ export default function Signup() {
                 </p>
               )}
             </div>
-
-            {/* Confirm Password Field */}
+            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Confirm Password
@@ -371,8 +331,7 @@ export default function Signup() {
                 </p>
               )}
             </div>
-
-            {/* Role Selection */}
+            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Account Type
@@ -402,8 +361,7 @@ export default function Signup() {
                 {formData.role === 'admin' && '⚙️ Full system access and management'}
               </p>
             </div>
-
-            {/* Terms and Conditions */}
+            {}
             <div className="flex items-start">
               <input
                 type="checkbox"
@@ -422,8 +380,7 @@ export default function Signup() {
                 </Link>
               </label>
             </div>
-
-            {/* Submit Button */}
+            {}
             <button
               type="submit"
               disabled={loading}
@@ -439,8 +396,7 @@ export default function Signup() {
               )}
             </button>
           </form>
-
-          {/* Divider */}
+          {}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200"></div>
@@ -449,8 +405,7 @@ export default function Signup() {
               <span className="px-4 bg-white text-gray-500">Already have an account?</span>
             </div>
           </div>
-
-          {/* Login Link */}
+          {}
           <Link
             to="/login"
             className="block w-full text-center py-3 border-2 border-green-600 text-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors"
@@ -458,8 +413,7 @@ export default function Signup() {
             Sign In
           </Link>
         </div>
-
-        {/* Footer */}
+        {}
         <p className="mt-8 text-center text-xs text-gray-400">
           &copy; {new Date().getFullYear()} Forest Department. All rights reserved.
         </p>

@@ -1,20 +1,13 @@
 import db from "../config/db.js";
 import { io } from "../../server.js";
 import { sendPushNotification } from './notificationController.js';
-
-/**
- * Create a new hotspot
- */
 export const createHotspot = async (req, res) => {
   try {
     const { name, type, description, latitude, longitude, metadata } = req.body;
     const userId = req.user.id;
-
     if (!name || !type || !latitude || !longitude) {
       return res.status(400).json({ error: "name, type, latitude, longitude required" });
     }
-
-    // Insert hotspot
     const result = await db.query(
       `INSERT INTO hotspots (name, type, description, location, created_by)
        VALUES ($1, $2, $3, ST_SetSRID(ST_Point($4, $5), 4326), $6)
@@ -25,10 +18,7 @@ export const createHotspot = async (req, res) => {
          created_by, is_active, created_at`,
       [name, type, description || null, longitude, latitude, userId]
     );
-
     const hotspot = result.rows[0];
-
-    // Add metadata if provided
     if (metadata && typeof metadata === 'object') {
       for (const [key, value] of Object.entries(metadata)) {
         await db.query(
@@ -38,36 +28,25 @@ export const createHotspot = async (req, res) => {
         );
       }
     }
-
-    // Create default alert zone (500m radius)
     await db.query(
       `INSERT INTO alert_zones (hotspot_id, radius_meters, alert_level, zone_geometry)
        VALUES ($1, 500, 'medium', 
          ST_Buffer(ST_SetSRID(ST_Point($2, $3), 4326)::geography, 500)::geography)`,
       [hotspot.id, longitude, latitude]
     );
-
-    // Broadcast to connected clients
     io.emit('hotspot_created', hotspot);
-
     res.status(201).json({
       message: "Hotspot created successfully",
       hotspot
     });
-
   } catch (err) {
     console.error("Create hotspot error:", err);
     res.status(500).json({ error: "Failed to create hotspot" });
   }
 };
-
-/**
- * Get all hotspots with optional filters
- */
 export const getHotspots = async (req, res) => {
   try {
     const { type, active, near_lat, near_lng, radius_km } = req.query;
-
     let query = `
       SELECT 
         h.id, h.name, h.type, h.description,
@@ -86,23 +65,18 @@ export const getHotspots = async (req, res) => {
       LEFT JOIN hotspot_metadata hm ON h.id = hm.hotspot_id
       WHERE 1=1
     `;
-
     const params = [];
     let paramCount = 0;
-
     if (type) {
       paramCount++;
       query += ` AND h.type = $${paramCount}`;
       params.push(type);
     }
-
     if (active !== undefined) {
       paramCount++;
       query += ` AND h.is_active = $${paramCount}`;
       params.push(active === 'true');
     }
-
-    // Proximity filter
     if (near_lat && near_lng && radius_km) {
       paramCount += 3;
       query += ` AND ST_DWithin(
@@ -112,26 +86,17 @@ export const getHotspots = async (req, res) => {
       )`;
       params.push(parseFloat(near_lat), parseFloat(near_lng), parseFloat(radius_km));
     }
-
     query += ` GROUP BY h.id, u.name ORDER BY h.created_at DESC`;
-
     const result = await db.query(query, params);
-
     res.json(result.rows);
-
   } catch (err) {
     console.error("Get hotspots error:", err);
     res.status(500).json({ error: "Failed to fetch hotspots" });
   }
 };
-
-/**
- * Get hotspot by ID with details
- */
 export const getHotspotById = async (req, res) => {
   try {
     const { id } = req.params;
-
     const result = await db.query(
       `SELECT 
         h.id, h.name, h.type, h.description,
@@ -151,27 +116,19 @@ export const getHotspotById = async (req, res) => {
       GROUP BY h.id, u.name, az.radius_meters, az.alert_level`,
       [id]
     );
-
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Hotspot not found" });
     }
-
     res.json(result.rows[0]);
-
   } catch (err) {
     console.error("Get hotspot error:", err);
     res.status(500).json({ error: "Failed to fetch hotspot" });
   }
 };
-
-/**
- * Update hotspot
- */
 export const updateHotspot = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, type, description, latitude, longitude, is_active } = req.body;
-
     const result = await db.query(
       `UPDATE hotspots
        SET 
@@ -193,55 +150,35 @@ export const updateHotspot = async (req, res) => {
          is_active, updated_at`,
       [name, type, description, latitude, longitude, is_active, id]
     );
-
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Hotspot not found" });
     }
-
-    // Broadcast update
     io.emit('hotspot_updated', result.rows[0]);
-
     res.json(result.rows[0]);
-
   } catch (err) {
     console.error("Update hotspot error:", err);
     res.status(500).json({ error: "Failed to update hotspot" });
   }
 };
-
-/**
- * Delete hotspot
- */
 export const deleteHotspot = async (req, res) => {
   try {
     const { id } = req.params;
-
     const result = await db.query(
       `DELETE FROM hotspots WHERE id = $1 RETURNING id`,
       [id]
     );
-
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Hotspot not found" });
     }
-
-    // Broadcast deletion
     io.emit('hotspot_deleted', { id: parseInt(id) });
-
     res.json({ message: "Hotspot deleted successfully" });
-
   } catch (err) {
     console.error("Delete hotspot error:", err);
     res.status(500).json({ error: "Failed to delete hotspot" });
   }
 };
-
-/**
- * Check proximity alerts when elephant detected
- */
 export const checkProximityAlerts = async (latitude, longitude, deviceId) => {
   try {
-    // Find hotspots within alert zones
     const hotspots = await db.query(
       `SELECT 
         h.id, h.name, h.type,
@@ -261,9 +198,7 @@ export const checkProximityAlerts = async (latitude, longitude, deviceId) => {
       ORDER BY distance_meters ASC`,
       [longitude, latitude]
     );
-
     if (hotspots.rows.length > 0) {
-      // Get users who should receive alerts
       const users = await db.query(
         `SELECT DISTINCT u.id
          FROM users u
@@ -276,13 +211,9 @@ export const checkProximityAlerts = async (latitude, longitude, deviceId) => {
            )`,
         [longitude, latitude]
       );
-
       const userIds = users.rows.map(u => u.id);
-
-      // Send alerts for each hotspot
       for (const hotspot of hotspots.rows) {
         const alertMessage = `⚠️ Elephant detected ${Math.round(hotspot.distance_meters)}m from ${hotspot.name} (${hotspot.type})`;
-        
         await sendPushNotification(
           userIds,
           'Proximity Alert!',
@@ -297,8 +228,6 @@ export const checkProximityAlerts = async (latitude, longitude, deviceId) => {
             alert_level: hotspot.alert_level
           }
         );
-
-        // Save to notifications
         await db.query(
           `INSERT INTO notifications (user_id, title, body, data)
            SELECT id, $1, $2, $3 FROM users WHERE id = ANY($4)`,
@@ -315,15 +244,12 @@ export const checkProximityAlerts = async (latitude, longitude, deviceId) => {
             userIds
           ]
         );
-
-        // Broadcast via WebSocket
         io.emit('proximity_alert', {
           hotspot: hotspot,
           detection: { latitude, longitude, deviceId }
         });
       }
     }
-
   } catch (err) {
     console.error("Proximity alert error:", err);
   }

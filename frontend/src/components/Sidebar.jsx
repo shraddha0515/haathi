@@ -7,28 +7,21 @@ import {
   MapPin,
   User,
   Settings,
-  LogOut,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
-
 export default function Sidebar() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
-
-  // Role-based navigation items
   const getNavItems = () => {
     const baseItems = [
       { name: "Home", icon: <Home size={20} />, path: getHomePath(), roles: ["user", "officer", "admin"] },
       { name: "History", icon: <History size={20} />, path: "/history", roles: ["user", "officer", "admin"] },
       { name: "Hotspots", icon: <MapPin size={20} />, path: "/hotspots", roles: ["user", "officer", "admin"] }
     ];
-
-    // Filter items based on user role
     return baseItems.filter(item => item.roles.includes(user?.role));
   };
-
   const getHomePath = () => {
     switch (user?.role) {
       case "admin":
@@ -41,41 +34,27 @@ export default function Sidebar() {
         return "/dashboard";
     }
   };
-
-  const handleLogout = async () => {
-    await logout();
-  };
-
   const handleProfileClick = () => {
     navigate("/profile");
   };
-
   const navItems = getNavItems();
-
   return (
     <div
       className={`${
         collapsed ? "w-20" : "w-64"
       } bg-gradient-to-b from-gray-800 to-gray-900 text-white h-screen flex flex-col transition-all duration-300 shadow-2xl relative`}
     >
-      {/* Toggle Button */}
+      {}
       <button
         onClick={() => setCollapsed(!collapsed)}
         className="absolute -right-1 top-8 bg-gray-700 hover:bg-gray-600 text-white rounded-full p-1.5 shadow-lg transition-all z-10"
       >
         {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
       </button>
-
-      {/* Header - Logo + Airavat */}
+      {}
       <div className="px-4 py-6 border-b border-gray-700">
         <div className="flex items-center gap-3">
-          {/* <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/375/375048.png"
-              alt="Logo"
-              className="w-6 h-6"
-            />
-          </div> */}
+          {}
           {!collapsed && (
             <div>
               <h1 className="text-lg font-bold text-white">Airavat</h1>
@@ -84,8 +63,7 @@ export default function Sidebar() {
           )}
         </div>
       </div>
-
-      {/* Middle - Navigation */}
+      {}
       <nav className="flex-1 mt-4 px-3 space-y-1">
         {navItems.map((item) => (
           <NavLink
@@ -104,10 +82,9 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-
-      {/* Bottom - Profile + Name + Role */}
+      {}
       <div className="border-t border-gray-700 p-4">
-        {/* Profile Section */}
+        {}
         <div
           onClick={handleProfileClick}
           className={`flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 cursor-pointer transition-all mb-2 ${
@@ -131,27 +108,6 @@ export default function Sidebar() {
             <Settings size={16} className="text-gray-400 hover:text-white transition-colors" />
           )}
         </div>
-
-        {/* Logout Button */}
-        {!collapsed && (
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-all"
-          >
-            <LogOut size={18} />
-            <span className="text-sm font-medium">Logout</span>
-          </button>
-        )}
-
-        {collapsed && (
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center p-2 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-all"
-            title="Logout"
-          >
-            <LogOut size={18} />
-          </button>
-        )}
       </div>
     </div>
   );

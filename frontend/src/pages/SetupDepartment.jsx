@@ -1,5 +1,4 @@
 import React from "react";
-
 export default function SetupDepartment() {
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-green-50">

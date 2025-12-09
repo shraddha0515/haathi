@@ -3,15 +3,11 @@ import { Plus, HardDrive, MapPin, Battery, Signal, Loader2 } from "lucide-react"
 import Sidebar from "../components/Sidebar";
 import axios from "axios";
 import { toast } from "react-toastify";
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URI || "https://sih-saksham.onrender.com";
-
 export default function OfficerDashboard() {
     const [showAddDeviceModal, setShowAddDeviceModal] = useState(false);
     const [devices, setDevices] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    // Form State
     const [formData, setFormData] = useState({
         device_id: "",
         description: "",
@@ -19,11 +15,9 @@ export default function OfficerDashboard() {
         longitude: ""
     });
     const [submitting, setSubmitting] = useState(false);
-
     useEffect(() => {
         fetchDevices();
     }, []);
-
     const fetchDevices = async () => {
         try {
             const token = localStorage.getItem("accessToken");
@@ -33,12 +27,10 @@ export default function OfficerDashboard() {
             setDevices(res.data);
         } catch (err) {
             console.error("Error fetching devices:", err);
-            // toast.error("Failed to load devices");
         } finally {
             setLoading(false);
         }
     };
-
     const handleAddDevice = async (e) => {
         e.preventDefault();
         setSubmitting(true);
@@ -50,7 +42,7 @@ export default function OfficerDashboard() {
             toast.success("Device registered successfully!");
             setShowAddDeviceModal(false);
             setFormData({ device_id: "", description: "", latitude: "", longitude: "" });
-            fetchDevices(); // Refresh list
+            fetchDevices(); 
         } catch (err) {
             console.error("Error adding device:", err);
             toast.error(err?.response?.data?.message || "Failed to register device");
@@ -58,7 +50,6 @@ export default function OfficerDashboard() {
             setSubmitting(false);
         }
     };
-
     return (
         <div className="flex h-screen bg-gray-50">
             <Sidebar />
@@ -77,8 +68,7 @@ export default function OfficerDashboard() {
                     Add New Device
                 </button>
             </div>
-
-            {/* Devices Grid */}
+            {}
             {loading ? (
                 <div className="flex justify-center py-12">
                     <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
@@ -111,12 +101,10 @@ export default function OfficerDashboard() {
                                     </div>
                                 </div>
                             </div>
-
                             <div className="flex items-start text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
                                 <MapPin className="w-4 h-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0" />
                                 {device.description || "No description"}
                             </div>
-
                             <div className="mt-4 flex space-x-2">
                                 <button className="flex-1 py-2 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
                                     View Logs
@@ -133,8 +121,7 @@ export default function OfficerDashboard() {
                     )}
                 </div>
             )}
-
-            {/* Add Device Modal */}
+            {}
             {showAddDeviceModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-2xl w-full max-w-md shadow-2xl">
@@ -188,7 +175,6 @@ export default function OfficerDashboard() {
                                     />
                                 </div>
                             </div>
-
                             <div className="flex justify-end space-x-3 mt-6">
                                 <button
                                     type="button"
