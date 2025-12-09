@@ -51,9 +51,25 @@ const server = createServer(app);
 
 export const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      const isAllowed = allowedOrigins.some((o) => {
+        if (o instanceof RegExp) return o.test(origin);
+        return o === origin;
+      });
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        console.warn("Socket.IO CORS blocked:", origin);
+        callback(null, false);
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST"],
   },
+  allowEIO3: true,
 });
 
 io.on("connection", (socket) => {
