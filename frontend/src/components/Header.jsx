@@ -14,10 +14,7 @@ export default function Header() {
       {}
       <div className="flex items-center gap-3">
         {}
-        <div>
-          <h1 className="text-green-700 font-semibold text-lg">Project Airavata</h1>
-          <p className="text-xs text-gray-500 -mt-1">HEC Command Center</p>
-        </div>
+        
       </div>
       {}
       <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-full px-3 py-1 text-sm text-green-700">

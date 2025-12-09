@@ -17,15 +17,77 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   useEffect(() => {
     initializeAuth();
+
+    // Set up periodic token refresh (every 10 minutes)
+    const refreshInterval = setInterval(() => {
+      refreshAccessToken();
+    }, 10 * 60 * 1000); // 10 minutes
+
+    return () => clearInterval(refreshInterval);
   }, []);
-  const initializeAuth = () => {
+
+  const refreshAccessToken = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const loginTime = localStorage.getItem("loginTime");
+
+      if (!token || !loginTime) return;
+
+      // Check if login is within 7 days
+      const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+      const timeSinceLogin = Date.now() - parseInt(loginTime);
+
+      if (timeSinceLogin > sevenDaysInMs) {
+        // Session expired after 7 days
+        clearAuth();
+        return;
+      }
+
+      // Refresh the access token
+      const res = await axiosInstance.post('/api/auth/refresh');
+      if (res.data.accessToken) {
+        localStorage.setItem("accessToken", res.data.accessToken);
+      }
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      // If refresh fails after 7 days, clear auth
+      const loginTime = localStorage.getItem("loginTime");
+      if (loginTime) {
+        const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+        const timeSinceLogin = Date.now() - parseInt(loginTime);
+        if (timeSinceLogin > sevenDaysInMs) {
+          clearAuth();
+        }
+      }
+    }
+  };
+
+  const initializeAuth = async () => {
     try {
       const token = localStorage.getItem("accessToken");
       const userData = localStorage.getItem("user");
+      const loginTime = localStorage.getItem("loginTime");
+
       if (token && userData) {
+        // Check if login is within 7 days
+        if (loginTime) {
+          const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+          const timeSinceLogin = Date.now() - parseInt(loginTime);
+
+          if (timeSinceLogin > sevenDaysInMs) {
+            // Session expired after 7 days
+            clearAuth();
+            setLoading(false);
+            return;
+          }
+        }
+
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
         setIsAuthenticated(true);
+
+        // Try to refresh the token on app load
+        await refreshAccessToken();
       }
     } catch (error) {
       console.error("Error initializing auth:", error);
@@ -47,6 +109,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("role", userData.role);
+      localStorage.setItem("loginTime", Date.now().toString()); // Store login timestamp
       setUser(userData);
       setIsAuthenticated(true);
       navigateByRole(userData.role);
@@ -72,6 +135,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("role", userData.role);
+      localStorage.setItem("loginTime", Date.now().toString()); // Store login timestamp
       setUser(userData);
       setIsAuthenticated(true);
       navigateByRole(userData.role);
@@ -98,6 +162,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
     localStorage.removeItem("role");
+    localStorage.removeItem("loginTime");
     setUser(null);
     setIsAuthenticated(false);
   };
