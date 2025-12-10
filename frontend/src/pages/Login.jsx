@@ -3,6 +3,8 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Eye, EyeOff, Lock, Mail, Loader2, AlertCircle } from "lucide-react";
+import elephantBg from "../assets/elephant_bg.png";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URI || "https://sih-saksham.onrender.com";
 export default function Login() {
   const navigate = useNavigate();
@@ -51,7 +53,7 @@ export default function Login() {
       const res = await axios.post(
         `${API_BASE_URL}/api/auth/login`,
         formData,
-        { 
+        {
           withCredentials: true,
           headers: {
             'Content-Type': 'application/json'
@@ -103,85 +105,94 @@ export default function Login() {
     }
   };
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-50 px-4 py-8">
-      {}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
-      <div className="w-full max-w-md relative z-10">
-        {}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg mb-4 transform hover:scale-105 transition-transform">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/375/375048.png"
-              alt="Elephant"
-              className="w-10 h-10"
-            />
+    <div className="min-h-screen flex bg-black">
+      {/* Left Side - Image */}
+      <div className="hidden lg:block lg:w-1/2 relative overflow-hidden">
+        <img
+          src={elephantBg}
+          alt="Majestic Elephant"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute top-8 left-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center border border-white/20">
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/375/375048.png"
+                alt="Elephant"
+                className="w-6 h-6 invert"
+              />
+            </div>
+            <span className="text-white font-bold text-xl tracking-tight">Project Airavata</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Project Airavata</h1>
-          <p className="text-gray-600 text-sm">Human-Elephant Conflict Prevention System</p>
         </div>
-        {}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
-            <p className="text-gray-500 text-sm mt-1">Sign in to access your dashboard</p>
+      </div>
+
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-black">
+        <div className="w-full max-w-md space-y-8">
+          <div className="text-center lg:text-left">
+            <h2 className="text-3xl font-bold text-white mb-2">Log in to the world<br />of Wild</h2>
+            <div className="flex items-center justify-center lg:justify-start gap-2 mt-4 text-sm">
+              <span className="text-gray-400">Log In</span>
+              <span className="text-gray-600">|</span>
+              <Link to="/signup" className="text-yellow-500 font-medium hover:text-yellow-400 transition-colors">Sign Up</Link>
+            </div>
           </div>
-          {}
+
           {errors.general && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
+            <div className="p-4 bg-red-900/20 border border-red-800 rounded-lg flex items-start">
               <AlertCircle className="w-5 h-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700">{errors.general}</p>
+              <p className="text-sm text-red-400">{errors.general}</p>
             </div>
           )}
-          {}
-          <form onSubmit={handleLogin} className="space-y-5">
-            {}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
+
+          <form onSubmit={handleLogin} className="space-y-6">
+            {/* Email Field */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">
+                Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full pl-11 pr-4 py-3 border ${
-                    errors.email ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
-                  } rounded-lg outline-none transition-all text-gray-900`}
-                  placeholder="name@example.com"
+                  className={`w-full bg-transparent border-b ${errors.email ? 'border-red-500' : 'border-gray-700 focus:border-white'
+                    } py-3 text-white placeholder-transparent focus:outline-none transition-colors`}
+                  placeholder="Email"
                   disabled={loading}
                 />
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-500 flex items-center">
+                    <AlertCircle className="w-3 h-3 mr-1" />
+                    {errors.email}
+                  </p>
+                )}
               </div>
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600 flex items-center">
-                  <AlertCircle className="w-4 h-4 mr-1" />
-                  {errors.email}
-                </p>
-              )}
             </div>
-            {}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+
+            {/* Password Field */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full pl-11 pr-12 py-3 border ${
-                    errors.password ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
-                  } rounded-lg outline-none transition-all text-gray-900`}
-                  placeholder="Enter your password"
+                  className={`w-full bg-transparent border-b ${errors.password ? 'border-red-500' : 'border-gray-700 focus:border-white'
+                    } py-3 text-white placeholder-transparent focus:outline-none transition-colors`}
+                  placeholder="Password"
                   disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
                   disabled={loading}
                 >
                   {showPassword ? (
@@ -192,65 +203,38 @@ export default function Login() {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600 flex items-center">
-                  <AlertCircle className="w-4 h-4 mr-1" />
+                <p className="mt-1 text-sm text-red-500 flex items-center">
+                  <AlertCircle className="w-3 h-3 mr-1" />
                   {errors.password}
                 </p>
               )}
             </div>
-            {}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                />
-                <span className="ml-2 text-sm text-gray-600">Remember me</span>
-              </label>
-              <Link
-                to="/forgot-password"
-                className="text-sm text-green-600 hover:text-green-700 font-medium hover:underline"
+
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-full transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
               >
-                Forgot password?
-              </Link>
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Logging in...
+                  </>
+                ) : (
+                  "Log In"
+                )}
+              </button>
             </div>
-            {}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 rounded-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none shadow-lg shadow-green-500/30 flex items-center justify-center"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                "Sign In"
-              )}
-            </button>
+
+            <div className="text-center pt-4">
+              <span className="text-gray-500 text-sm">or</span>
+              <p className="mt-4 text-sm text-gray-400">
+                Don't have an account? <Link to="/signup" className="text-yellow-500 hover:text-yellow-400 ml-1">Sign Up</Link>
+              </p>
+            </div>
           </form>
-          {}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">Don't have an account?</span>
-            </div>
-          </div>
-          {/* Signup Link */}
-          <Link
-            to="/signup"
-            className="block w-full text-center py-3 border-2 border-green-600 text-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors"
-          >
-            Create Account
-          </Link>
         </div>
-        {/* Footer */}
-        <p className="mt-8 text-center text-xs text-gray-400">
-          &copy; {new Date().getFullYear()} Forest Department. All rights reserved.
-        </p>
       </div>
     </div>
   );

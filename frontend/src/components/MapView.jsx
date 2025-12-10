@@ -12,7 +12,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 const elephantIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/375/375048.png", 
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/11879/11879913.png ", // Elephant icon
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
