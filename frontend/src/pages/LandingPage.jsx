@@ -1,5 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import logo from "../assets/logo.png";
+
 import {
   Shield, MapPin, Bell, Smartphone, Users, TrendingUp,
   Zap, Globe, CheckCircle, ArrowRight, Menu, X
@@ -54,15 +56,16 @@ export default function LandingPage() {
   ];
   return (
     <div className="min-h-screen bg-white">
-      {}
+      { }
       <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-sm z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {}
+            { }
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
                 <img
-                  src="https://cdn-icons-png.flaticon.com/512/375/375048.png"
+                  // src="https://cdn-icons-png.flaticon.com/512/375/375048.png"
+                  src={logo}
                   alt="Elephant"
                   className="w-6 h-6"
                 />
@@ -71,7 +74,7 @@ export default function LandingPage() {
                 Airavata
               </span>
             </div>
-            {}
+            { }
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-gray-700 hover:text-emerald-600 transition-colors">Features</a>
               <a href="#why-us" className="text-gray-700 hover:text-emerald-600 transition-colors">Why Us</a>
@@ -83,7 +86,7 @@ export default function LandingPage() {
                 Get Started
               </Link>
             </div>
-            {}
+            { }
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-gray-100"
@@ -92,7 +95,7 @@ export default function LandingPage() {
             </button>
           </div>
         </div>
-        {}
+        { }
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t">
             <div className="px-4 py-4 space-y-3">
@@ -109,11 +112,11 @@ export default function LandingPage() {
           </div>
         )}
       </nav>
-      {}
+      { }
       <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-emerald-50 via-teal-50 to-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            {}
+            { }
             <div className="space-y-6">
               <div className="inline-block px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">
                 Human-Elephant Conflict Prevention
@@ -132,7 +135,7 @@ export default function LandingPage() {
                   to="/signup"
                   className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg font-semibold flex items-center justify-center group"
                 >
-                  Get Started                  
+                  Get Started
                   <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
                 </Link>
                 <a
@@ -143,7 +146,7 @@ export default function LandingPage() {
                 </a>
               </div>
             </div>
-            {}
+            { }
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img
@@ -159,7 +162,7 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-          {}
+          { }
           <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((stat, index) => (
               <div key={index} className="text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
@@ -170,7 +173,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      {}
+      { }
       <section id="about" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -211,7 +214,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      {}
+      { }
       <section id="why-us" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-emerald-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -253,7 +256,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      {}
+      { }
       <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -277,7 +280,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      {}
+      { }
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-emerald-600 to-teal-600">
         <div className="max-w-4xl mx-auto text-center text-white">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -302,11 +305,11 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      {}
+      { }
       <footer className="bg-gray-900 text-gray-300 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8 mb-8">
-            {}
+            { }
             <div className="col-span-1">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">

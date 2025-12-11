@@ -9,6 +9,7 @@ import eventRoutes from "./src/routes/eventRoutes.js";
 import deviceRoutes from "./src/routes/devices.js";
 import hotspotRoutes from "./src/routes/hotspots.js";
 import userRoutes from "./src/routes/users.js";
+import healthRoutes from "./src/routes/healthRoutes.js";
 
 dotenv.config();
 
@@ -88,26 +89,10 @@ app.use("/api/events", eventRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/hotspots", hotspotRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api", healthRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Backend is running" });
-});
-
-app.get("/health", async (req, res) => {
-  try {
-    const result = await db.query("SELECT NOW()");
-    res.json({
-      status: "healthy",
-      database: "connected",
-      timestamp: result.rows[0].now,
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "unhealthy",
-      database: "disconnected",
-      error: error.message,
-    });
-  }
 });
 
 server.listen(PORT, "0.0.0.0", () => {

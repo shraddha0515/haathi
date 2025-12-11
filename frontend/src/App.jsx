@@ -17,6 +17,7 @@ import SetupConfiguration from "./pages/SetupConfiguration";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import OfficerDashboard from "./pages/OfficerDashboard";
+import TestNotifications from "./pages/TestNotifications";
 import PrivateRoute from "./components/PrivateRoute";
 import RoleBasedRoute from "./components/RoleBasedRoute";
 import MainLayout from "./components/MainLayout";
@@ -31,6 +32,7 @@ function AppContent() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/test-notifications" element={<TestNotifications />} />
         {}
         <Route path="/setup/welcome" element={<SetupWelcome />} />
         <Route path="/setup/department" element={<SetupDepartment />} />

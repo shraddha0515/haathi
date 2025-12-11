@@ -11,6 +11,7 @@ export default function UserDashboard() {
     const { latestEvent } = useSocket();
     const [userLocation, setUserLocation] = useState(null);
     const [elephantLocation, setElephantLocation] = useState(null);
+    const [allEvents, setAllEvents] = useState([]);
     const [notifications, setNotifications] = useState([]);
     const [isSafe, setIsSafe] = useState(true);
     const [locationError, setLocationError] = useState(null);
@@ -60,6 +61,8 @@ export default function UserDashboard() {
             if (latestEvent.latitude && latestEvent.longitude) {
                 setElephantLocation([latestEvent.latitude, latestEvent.longitude]);
                 setIsSafe(false); 
+                // Add to allEvents array
+                setAllEvents((prev) => [latestEvent, ...prev]);
             }
             const newNotif = {
                 id: Date.now(),
@@ -75,6 +78,7 @@ export default function UserDashboard() {
             try {
                 const res = await axios.get(`${API_BASE_URL}/api/events`);
                 if (res.data && res.data.length > 0) {
+                    setAllEvents(res.data);
                     const latest = res.data[0];
                     if (latest.latitude && latest.longitude) {
                         setElephantLocation([latest.latitude, latest.longitude]);
@@ -175,7 +179,7 @@ export default function UserDashboard() {
                                     </span>
                                 )}
                             </div>
-                            <MapView userLocation={userLocation} elephantLocation={elephantLocation} />
+                            <MapView userLocation={userLocation} elephantLocation={elephantLocation} allDetections={allEvents} />
                         </div>
                         {/* Notifications Section */}
                         <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 h-fit max-h-[600px] overflow-y-auto">

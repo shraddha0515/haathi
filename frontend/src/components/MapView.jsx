@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -12,7 +12,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 const elephantIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/375/375048.png", 
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/11879/11879914.png", 
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
@@ -32,10 +32,42 @@ function MapUpdater({ center }) {
   }, [center, map]);
   return null;
 }
-export default function MapView({ userLocation, elephantLocation }) {
-  const defaultCenter = [21.34, 82.75]; 
+export default function MapView({ userLocation, elephantLocation, allDetections = [] }) {
+  const defaultCenter = [21.34, 82.75];
+  const [mapMode, setMapMode] = useState("both"); // "user", "detections", "both"
+  
+  // Determine what to show on the map based on mode
+  const getMapCenter = () => {
+    if (mapMode === "user" || mapMode === "both") {
+      if (userLocation) return userLocation;
+    }
+    if (mapMode === "detections" || mapMode === "both") {
+      if (elephantLocation) return elephantLocation;
+      if (allDetections && allDetections.length > 0) {
+        const latest = allDetections[0];
+        if (latest.latitude && latest.longitude) {
+          return [parseFloat(latest.latitude), parseFloat(latest.longitude)];
+        }
+      }
+    }
+    return defaultCenter;
+  };
+
   return (
-    <div className="w-full h-[500px] rounded-xl border border-emerald-200 shadow-inner overflow-hidden relative z-0">
+    <div className="w-full h-[500px] rounded-xl border border-emerald-200 shadow-inner overflow-hidden relative">
+      {/* Dropdown Menu */}
+      <div className="absolute top-4 right-4 z-[1000]">
+        <select
+          value={mapMode}
+          onChange={(e) => setMapMode(e.target.value)}
+          className="bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+        >
+          <option value="both">🗺️ Both</option>
+          <option value="detections">🐘 Detections Only</option>
+          <option value="user">📍 My Location Only</option>
+        </select>
+      </div>
+
       <MapContainer
         center={userLocation || defaultCenter}
         zoom={13}
@@ -45,8 +77,9 @@ export default function MapView({ userLocation, elephantLocation }) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
-        {}
-        {userLocation && (
+        
+        {/* User Location Marker */}
+        {(mapMode === "user" || mapMode === "both") && userLocation && (
           <Marker position={userLocation} icon={userIcon}>
             <Popup>
               <div className="text-center">
@@ -56,18 +89,50 @@ export default function MapView({ userLocation, elephantLocation }) {
             </Popup>
           </Marker>
         )}
-        {}
-        {elephantLocation && (
+        
+        {/* Latest Elephant Detection Marker */}
+        {(mapMode === "detections" || mapMode === "both") && elephantLocation && (
           <Marker position={elephantLocation} icon={elephantIcon}>
             <Popup>
               <div className="text-center">
-                <b className="text-red-600">Elephant Detected!</b>
-                <p className="text-xs text-gray-500 m-0">Stay Away</p>
+                <b className="text-red-600">🐘 Elephant Detected!</b>
+                <p className="text-xs text-gray-500 m-0">Latest Detection</p>
+                <p className="text-xs text-gray-400 m-0 mt-1">Stay Away</p>
               </div>
             </Popup>
           </Marker>
         )}
-        <MapUpdater center={userLocation || elephantLocation || defaultCenter} />
+        
+        {/* All Detection Markers (if provided) */}
+        {(mapMode === "detections" || mapMode === "both") && allDetections && allDetections.map((detection, index) => {
+          if (detection.latitude && detection.longitude) {
+            const position = [parseFloat(detection.latitude), parseFloat(detection.longitude)];
+            // Skip if it's the same as elephantLocation to avoid duplicate markers
+            if (elephantLocation && 
+                Math.abs(position[0] - elephantLocation[0]) < 0.0001 && 
+                Math.abs(position[1] - elephantLocation[1]) < 0.0001) {
+              return null;
+            }
+            return (
+              <Marker key={`detection-${detection.id || index}`} position={position} icon={elephantIcon}>
+                <Popup>
+                  <div className="text-center">
+                    <b className="text-red-600">🐘 Elephant Detected</b>
+                    <p className="text-xs text-gray-600 m-0 mt-1">
+                      Device: {detection.source_device || detection.device_id || 'Unknown'}
+                    </p>
+                    <p className="text-xs text-gray-500 m-0 mt-1">
+                      {new Date(detection.detected_at || detection.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          }
+          return null;
+        })}
+        
+        <MapUpdater center={getMapCenter()} />
       </MapContainer>
     </div>
   );
