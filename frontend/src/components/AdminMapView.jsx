@@ -123,9 +123,9 @@ export default function AdminMapView({ devices, detections = [], userLocation = 
           onChange={(e) => setMapMode(e.target.value)}
           className="bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
         >
-          <option value="both">🗺️ Both</option>
-          <option value="detections">🐘 Detections Only</option>
-          <option value="devices">📡 Devices Only</option>
+          <option value="both">🗺️Both</option>
+          <option value="detections">🐘 Detections</option>
+          <option value="devices">📡 Devices </option>
         </select>
       </div>
 
@@ -133,7 +133,7 @@ export default function AdminMapView({ devices, detections = [], userLocation = 
       {distance && focusedEvent && (
         <div className="absolute top-4 left-4 z-[1000] bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-lg">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-gray-700">📏 Distance:</span>
+            <span className="text-sm font-semibold text-gray-700">Distance:</span>
             <span className="text-sm font-bold text-red-600">
               {distance < 1 
                 ? `${(distance * 1000).toFixed(0)} meters` 

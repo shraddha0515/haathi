@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Users, Shield, Activity, Plus, Search, HardDrive, Bell } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import AdminMapView from "../components/AdminMapView";
+import { useSocket } from "../context/SocketContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URI || "https://sih-saksham.onrender.com";
 export default function AdminDashboard() {
+    const { openMapModal } = useSocket();
     const [devices, setDevices] = useState([]);
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -467,7 +469,7 @@ export default function AdminDashboard() {
 
                     {/* Notification Dropdown Panel */}
                     {showNotifications && (
-                        <div className="notification-panel absolute right-6 top-20 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 max-h-[500px] overflow-hidden flex flex-col">
+                        <div className="notification-panel absolute right-6 top-20 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-[1000] max-h-[500px] overflow-hidden flex flex-col">
                             <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
                                 <h3 className="font-semibold text-gray-800">Notifications</h3>
                                 {unreadCount > 0 && (
@@ -486,7 +488,17 @@ export default function AdminDashboard() {
                                             key={notification.id}
                                             className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${!notification.read ? 'bg-blue-50' : ''
                                                 }`}
-                                            onClick={() => !notification.read && handleMarkAsRead(notification.id)}
+                                            onClick={() => {
+                                                // Mark as read
+                                                if (!notification.read) {
+                                                    handleMarkAsRead(notification.id);
+                                                }
+                                                // Open map modal if notification has event data
+                                                if (notification.data && openMapModal) {
+                                                    openMapModal(notification.data);
+                                                    setShowNotifications(false);
+                                                }
+                                            }}
                                         >
                                             <div className="flex justify-between items-start mb-1">
                                                 <h4 className="font-semibold text-sm text-gray-900">{notification.title}</h4>
@@ -497,6 +509,9 @@ export default function AdminDashboard() {
                                             <p className="text-sm text-gray-600 mb-2">{notification.body}</p>
                                             <p className="text-xs text-gray-400">
                                                 {new Date(notification.created_at).toLocaleString()}
+                                            </p>
+                                            <p className="text-xs text-blue-500 mt-1 font-medium">
+                                                Click to view on map →
                                             </p>
                                         </div>
                                     ))

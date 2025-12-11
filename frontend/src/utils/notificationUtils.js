@@ -58,12 +58,25 @@ export const showNotification = (title, options = {}) => {
 export const showElephantDetectionNotification = (eventData) => {
   const { device_id, latitude, longitude, detected_at } = eventData;
   
-  showNotification("🐘 Elephant Detected!", {
+  const notification = showNotification("🐘 Elephant Detected!", {
     body: `Device ${device_id} detected movement at coordinates (${latitude?.toFixed(4)}, ${longitude?.toFixed(4)})`,
     tag: `elephant-${eventData.id}`, // Prevents duplicate notifications
     data: eventData,
     icon: "/favicon.ico",
   });
+
+  // Add click handler to notification
+  if (notification) {
+    notification.onclick = () => {
+      // Dispatch custom event that the app can listen to
+      window.dispatchEvent(new CustomEvent('openElephantMap', { 
+        detail: eventData 
+      }));
+      notification.close();
+      // Focus the window
+      window.focus();
+    };
+  }
 
   // Play alert sound
   playAlertSound();
@@ -76,12 +89,26 @@ export const showElephantDetectionNotification = (eventData) => {
 export const showProximityAlertNotification = (alertData) => {
   const { hotspot, detection } = alertData;
   
-  showNotification("⚠️ Proximity Alert!", {
+  const notification = showNotification("⚠️ Proximity Alert!", {
     body: `Elephant detected near ${hotspot.name} (${Math.round(hotspot.distance_meters)}m away)`,
     tag: `proximity-${hotspot.id}`,
     data: alertData,
     icon: "/favicon.ico",
   });
+
+  // Add click handler to notification
+  if (notification) {
+    notification.onclick = () => {
+      // Dispatch custom event with detection data
+      const eventData = detection || alertData;
+      window.dispatchEvent(new CustomEvent('openElephantMap', { 
+        detail: eventData 
+      }));
+      notification.close();
+      // Focus the window
+      window.focus();
+    };
+  }
 
   // Play alert sound
   playAlertSound();
@@ -92,22 +119,12 @@ export const showProximityAlertNotification = (alertData) => {
  */
 export const playAlertSound = () => {
   try {
-    // Create a simple beep sound using Web Audio API
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    oscillator.frequency.value = 800; // Frequency in Hz
-    oscillator.type = "sine";
-
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.5);
+    // Use the alarm.wav file from assets
+    const audio = new Audio('/src/assets/alarm.WAV');
+    audio.volume = 0.7; // Set volume to 70%
+    audio.play().catch(error => {
+      console.error("Error playing alarm sound:", error);
+    });
   } catch (error) {
     console.error("Error playing alert sound:", error);
   }
