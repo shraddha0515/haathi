@@ -4,11 +4,12 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import MapModal from "../components/MapModal";
 import {
-  requestNotificationPermission,
-  showElephantDetectionNotification,
-  showProximityAlertNotification,
-  areNotificationsEnabled,
-  playAlertSound,
+    requestNotificationPermission,
+    showElephantDetectionNotification,
+    showProximityAlertNotification,
+    areNotificationsEnabled,
+    playAlertSound,
+    stopAlertSound,
 } from "../utils/notificationUtils";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URI || "https://sih-saksham.onrender.com";
@@ -44,21 +45,24 @@ export const SocketProvider = ({ children }) => {
     // Function to open map modal with event data (exported via context)
     const openMapModal = async (eventData) => {
         setModalEventData(eventData);
-        
+
         // Fetch device location if we have a device ID
         if (eventData.source_device || eventData.device_id) {
             const deviceId = eventData.source_device || eventData.device_id;
             const deviceLocation = await fetchDeviceLocation(deviceId);
             setModalDeviceLocation(deviceLocation);
         }
-        
+
         setMapModalOpen(true);
     };
 
     // Custom toast content with click handler
     const ToastContent = ({ message, eventData }) => (
-        <div 
-            onClick={() => openMapModal(eventData)}
+        <div
+            onClick={() => {
+                stopAlertSound(); // Stop the alarm when toast is clicked
+                openMapModal(eventData);
+            }}
             className="cursor-pointer hover:opacity-90 transition-opacity"
         >
             <div className="font-semibold">{message}</div>
@@ -83,6 +87,7 @@ export const SocketProvider = ({ children }) => {
 
         // Listen for browser notification clicks
         const handleNotificationClick = (event) => {
+            stopAlertSound(); // Stop the alarm when browser notification is clicked
             openMapModal(event.detail);
         };
         window.addEventListener('openElephantMap', handleNotificationClick);
@@ -125,7 +130,7 @@ export const SocketProvider = ({ children }) => {
 
             // Show clickable toast notification
             toast.warning(
-                <ToastContent 
+                <ToastContent
                     message={`🐘 Elephant Detected! Device ${data.source_device} at (${data.latitude?.toFixed(4)}, ${data.longitude?.toFixed(4)})`}
                     eventData={data}
                 />,
@@ -154,7 +159,7 @@ export const SocketProvider = ({ children }) => {
             // Show clickable toast notification
             const eventData = data.detection || data;
             toast.error(
-                <ToastContent 
+                <ToastContent
                     message={`⚠️ Proximity Alert! Elephant near ${data.hotspot?.name} (${Math.round(data.hotspot?.distance_meters)}m away)`}
                     eventData={eventData}
                 />,
@@ -178,7 +183,7 @@ export const SocketProvider = ({ children }) => {
     return (
         <SocketContext.Provider value={{ socket, latestEvent, connected, notificationsEnabled, openMapModal }}>
             {children}
-            <MapModal 
+            <MapModal
                 isOpen={mapModalOpen}
                 onClose={() => setMapModalOpen(false)}
                 eventData={modalEventData}

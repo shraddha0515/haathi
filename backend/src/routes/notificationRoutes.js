@@ -202,4 +202,94 @@ router.get('/settings', authenticateToken, async (req, res) => {
   }
 });
 
+/**
+ * Send custom alert to all users (Admin only)
+ * POST /api/notifications/send-alert
+ * Body: { 
+ *   title: "Alert Title",
+ *   message: "Alert message",
+ *   priority: "low" | "medium" | "high" | "critical"
+ * }
+ */
+router.post('/send-alert', authenticateToken, async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ 
+        error: 'Forbidden. Only admins can send alerts to all users.' 
+      });
+    }
+
+    const { title, message, priority } = req.body;
+
+    if (!title || !message) {
+      return res.status(400).json({ 
+        error: 'Title and message are required' 
+      });
+    }
+
+    // Get all users with notification tokens
+    const usersResult = await db.query(
+      `SELECT id, name, email, expo_push_token, fcm_web_token, device_platform
+       FROM users 
+       WHERE expo_push_token IS NOT NULL OR fcm_web_token IS NOT NULL`
+    );
+
+    const users = usersResult.rows;
+
+    if (users.length === 0) {
+      return res.json({ 
+        success: true,
+        message: 'No users with notification tokens found',
+        sent: 0
+      });
+    }
+
+    // Import notification service
+    const notificationService = (await import('../services/notificationService.js')).default;
+
+    // Send notifications
+    const result = await notificationService.sendCustomNotification(users, {
+      title,
+      body: message,
+      data: {
+        type: 'admin_alert',
+        priority: priority || 'medium',
+        sent_at: new Date().toISOString()
+      }
+    });
+
+    // Store notification in database for each user
+    const notificationInserts = users.map(user => 
+      db.query(
+        `INSERT INTO notifications (user_id, title, body, data, read)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [user.id, title, message, JSON.stringify({ type: 'admin_alert', priority }), false]
+      )
+    );
+
+    await Promise.all(notificationInserts);
+
+    console.log(`✅ Admin alert sent to ${users.length} users`);
+
+    res.json({
+      success: true,
+      message: `Alert sent successfully to ${users.length} users`,
+      sent: result.totalSent,
+      details: {
+        web: result.web,
+        mobile: result.mobile
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error sending admin alert:', error);
+    res.status(500).json({ 
+      error: 'Failed to send alert',
+      details: error.message
+    });
+  }
+});
+
 export default router;
+

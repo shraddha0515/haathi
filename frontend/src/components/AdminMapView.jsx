@@ -208,7 +208,7 @@ export default function AdminMapView({ devices, detections = [], userLocation = 
           return null;
         })}
         
-        {/* Render device markers */}
+       
         {(mapMode === "devices" || mapMode === "both") && devices && devices.map((device) => {
           if (device.latitude && device.longitude) {
             const position = [parseFloat(device.latitude), parseFloat(device.longitude)];

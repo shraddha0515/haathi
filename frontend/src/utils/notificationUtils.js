@@ -1,5 +1,8 @@
 // Browser Notification Utilities
 
+// Global audio reference to control playback
+let currentAlertAudio = null;
+
 /**
  * Request permission for browser notifications
  * @returns {Promise<boolean>} - true if permission granted
@@ -68,6 +71,9 @@ export const showElephantDetectionNotification = (eventData) => {
   // Add click handler to notification
   if (notification) {
     notification.onclick = () => {
+      // Stop the alert sound when notification is clicked
+      stopAlertSound();
+      
       // Dispatch custom event that the app can listen to
       window.dispatchEvent(new CustomEvent('openElephantMap', { 
         detail: eventData 
@@ -99,6 +105,9 @@ export const showProximityAlertNotification = (alertData) => {
   // Add click handler to notification
   if (notification) {
     notification.onclick = () => {
+      // Stop the alert sound when notification is clicked
+      stopAlertSound();
+      
       // Dispatch custom event with detection data
       const eventData = detection || alertData;
       window.dispatchEvent(new CustomEvent('openElephantMap', { 
@@ -119,14 +128,30 @@ export const showProximityAlertNotification = (alertData) => {
  */
 export const playAlertSound = () => {
   try {
+    // Stop any currently playing alert sound
+    stopAlertSound();
+    
     // Use the alarm.wav file from assets
-    const audio = new Audio('/src/assets/alarm.WAV');
-    audio.volume = 0.7; // Set volume to 70%
-    audio.play().catch(error => {
+    currentAlertAudio = new Audio('/src/assets/alarm.WAV');
+    currentAlertAudio.volume = 0.7; // Set volume to 70%
+    currentAlertAudio.loop = true; // Loop the sound until stopped
+    
+    currentAlertAudio.play().catch(error => {
       console.error("Error playing alarm sound:", error);
     });
   } catch (error) {
     console.error("Error playing alert sound:", error);
+  }
+};
+
+/**
+ * Stop the currently playing alert sound
+ */
+export const stopAlertSound = () => {
+  if (currentAlertAudio) {
+    currentAlertAudio.pause();
+    currentAlertAudio.currentTime = 0;
+    currentAlertAudio = null;
   }
 };
 
