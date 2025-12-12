@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
+import storage from "../utils/storage";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URI || "https://sih-saksham.onrender.com";
 const AuthContext = createContext();
 export const useAuth = () => {
@@ -28,8 +29,8 @@ export const AuthProvider = ({ children }) => {
 
   const refreshAccessToken = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-      const loginTime = localStorage.getItem("loginTime");
+      const token = storage.getItem("accessToken");
+      const loginTime = storage.getItem("loginTime");
 
       if (!token || !loginTime) return;
 
@@ -46,12 +47,12 @@ export const AuthProvider = ({ children }) => {
       // Refresh the access token
       const res = await axiosInstance.post('/api/auth/refresh');
       if (res.data.accessToken) {
-        localStorage.setItem("accessToken", res.data.accessToken);
+        storage.setItem("accessToken", res.data.accessToken);
       }
     } catch (error) {
       console.error("Token refresh failed:", error);
       // If refresh fails after 7 days, clear auth
-      const loginTime = localStorage.getItem("loginTime");
+      const loginTime = storage.getItem("loginTime");
       if (loginTime) {
         const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
         const timeSinceLogin = Date.now() - parseInt(loginTime);
@@ -64,9 +65,9 @@ export const AuthProvider = ({ children }) => {
 
   const initializeAuth = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-      const userData = localStorage.getItem("user");
-      const loginTime = localStorage.getItem("loginTime");
+      const token = storage.getItem("accessToken");
+      const userData = storage.getItem("user");
+      const loginTime = storage.getItem("loginTime");
 
       if (token && userData) {
         // Check if login is within 7 days
@@ -106,10 +107,10 @@ export const AuthProvider = ({ children }) => {
       if (!accessToken || !userData) {
         throw new Error("Invalid response from server");
       }
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("user", JSON.stringify(userData));
-      localStorage.setItem("role", userData.role);
-      localStorage.setItem("loginTime", Date.now().toString()); // Store login timestamp
+      storage.setItem("accessToken", accessToken);
+      storage.setItem("user", JSON.stringify(userData));
+      storage.setItem("role", userData.role);
+      storage.setItem("loginTime", Date.now().toString()); // Store login timestamp
       setUser(userData);
       setIsAuthenticated(true);
       navigateByRole(userData.role);
@@ -132,10 +133,10 @@ export const AuthProvider = ({ children }) => {
       if (!accessToken || !userData) {
         throw new Error("Invalid response from server");
       }
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("user", JSON.stringify(userData));
-      localStorage.setItem("role", userData.role);
-      localStorage.setItem("loginTime", Date.now().toString()); // Store login timestamp
+      storage.setItem("accessToken", accessToken);
+      storage.setItem("user", JSON.stringify(userData));
+      storage.setItem("role", userData.role);
+      storage.setItem("loginTime", Date.now().toString()); // Store login timestamp
       setUser(userData);
       setIsAuthenticated(true);
       navigateByRole(userData.role);
@@ -159,10 +160,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
   const clearAuth = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
-    localStorage.removeItem("role");
-    localStorage.removeItem("loginTime");
+    storage.removeItem("accessToken");
+    storage.removeItem("user");
+    storage.removeItem("role");
+    storage.removeItem("loginTime");
     setUser(null);
     setIsAuthenticated(false);
   };
@@ -184,7 +185,7 @@ export const AuthProvider = ({ children }) => {
   const updateUser = (updatedData) => {
     const updatedUser = { ...user, ...updatedData };
     setUser(updatedUser);
-    localStorage.setItem("user", JSON.stringify(updatedUser));
+    storage.setItem("user", JSON.stringify(updatedUser));
   };
   const value = {
     user,

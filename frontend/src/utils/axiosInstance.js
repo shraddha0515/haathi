@@ -1,11 +1,17 @@
 import axios from "axios";
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URI || "https://sih-saksham.onrender.com";
+import storage from "./storage";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URI || "https://sih-saksham.onrender.com";
+
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, 
+  withCredentials: true,
 });
+
 let isRefreshing = false;
 let failedQueue = [];
+
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
@@ -16,9 +22,10 @@ const processQueue = (error, token = null) => {
   });
   failedQueue = [];
 };
+
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken");
+    const token = storage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -28,12 +35,14 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
 axiosInstance.interceptors.response.use(
   (response) => {
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -47,17 +56,21 @@ axiosInstance.interceptors.response.use(
             return Promise.reject(err);
           });
       }
+
       originalRequest._retry = true;
       isRefreshing = true;
+
       try {
         const response = await axios.post(
           `${API_BASE_URL}/api/auth/refresh`,
           {},
           { withCredentials: true }
         );
+
         const { accessToken } = response.data;
+
         if (accessToken) {
-          localStorage.setItem("accessToken", accessToken);
+          storage.setItem("accessToken", accessToken);
           axiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           processQueue(null, accessToken);
@@ -65,16 +78,18 @@ axiosInstance.interceptors.response.use(
         }
       } catch (refreshError) {
         processQueue(refreshError, null);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("user");
-        localStorage.removeItem("role");
+        storage.removeItem("accessToken");
+        storage.removeItem("user");
+        storage.removeItem("role");
         window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }
     }
+
     return Promise.reject(error);
   }
 );
+
 export default axiosInstance;
