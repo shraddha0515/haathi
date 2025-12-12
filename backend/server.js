@@ -25,6 +25,7 @@ const allowedOrigins = [
   "http://127.0.0.1:3000",
   "https://haathi.vercel.app",
   "https://airavata.vercel.app",
+  "https://haathi-2.onrender.com",
   /\.ngrok-free\.app$/,
   /^exp:\/\/.*/,
 ];
